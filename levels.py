@@ -1,10 +1,11 @@
-from sprites import Emitter, Bomb, Obstacle, Player, Mirror, Goal
+from sprites import Sprite, Emitter, Bomb, Obstacle, Player, Mirror, Goal
+from sprites import *
 from config import GRID_SIZE
 import pygame
 
 __meta__ = type
 
-class Field(pygame.sprite.Sprite):
+class Field(Sprite):
     """
     obstacles: Obstacle[]
     size: (int, int)
@@ -21,16 +22,13 @@ class Field(pygame.sprite.Sprite):
         w, h = size
         self._map = {}
         self.size = size
+        self.pos = w/2., h/2.
         for x in xrange(w):
             self.add_sprite(Obstacle(pos=(x, 0)))
             self.add_sprite(Obstacle(pos=(x, h-1)))
         for y in xrange(1, h-1):
             self.add_sprite(Obstacle(pos=(0, y)))
             self.add_sprite(Obstacle(pos=(w-1, y)))
-
-        self.image = pygame.Surface((w * GRID_SIZE[0], h * GRID_SIZE[1]))
-        self.image.fill((0xff, 0xff, 0xff, 0xff))
-        self.rect = (0, 0)
 
     def add_sprite(self, sp):
         # unpack to check
@@ -52,7 +50,8 @@ class Field(pygame.sprite.Sprite):
 
     def remove_sprite_at(self, pos):
         x, y = pos
-        del self._map[x, y]
+        try: del self._map[x, y]
+        except: pass
 
     def remove_sprite(self, sp):
         x, y = sp.pos
@@ -65,6 +64,11 @@ class Field(pygame.sprite.Sprite):
             for y in xrange(h):
                 sp = self._map.get((x, y), None)
                 if sp: yield sp
+
+    def draw(self):
+        glScale(self.size[0], self.size[1], 0.01)
+        glColor3d(.6, .6, .5)
+        glutSolidCube(1)
 
 class Level:
     """
@@ -91,6 +95,8 @@ class Level:
             if isinstance(item, Player):
                 self.player = item
     def add(self, sp):
+        if isinstance(sp, Goal):
+            self.field.remove_sprite_at(sp.pos)
         self.field.add_sprite(sp)
 
 class Level_test(Level):
@@ -123,7 +129,7 @@ class Level_test_2(Level):
         A(Mirror(pos=(9, 2), orient=(-1, 1)))
         A(Mirror(pos=(9, 6), orient=(-1, -1)))
         A(Mirror(pos=(4, 1), orient=(0, 1)))
-        A(Goal(pos=(5, 1), orient=(0, 1)))
+        A(Goal(pos=(5, 0), orient=(0, 1)))
 
         self.collect()
 

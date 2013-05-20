@@ -1,5 +1,9 @@
 import pygame
-from config import GRID_SIZE
+import math
+from config import GRID_SIZE, FPS
+from OpenGL.GL import *
+from OpenGL.GLUT import *
+
 
 __meta__ = type
 
@@ -10,47 +14,56 @@ def alpha(color, a):
         r, g, b, _ = color
     return (r, g, b, a)
 
-class Sprite(pygame.sprite.Sprite):
+def glcolor(r, g, b, a):
+    return r/255., g/255., b/255., a/255.
+
+class Sprite(object):
+    """
+    pos
+    alive
+
+    draw()
+    update()
+    kill()
+    """
+    def __init__(self, pos=(0, 0)):
+        self.pos = pos
+        self.alive = True
+
+    def update(self):
+        pass
+
+    def draw(self):
+        pass
+
+class Item(Sprite):
     """
     pos
     orient
     reflective
     moveable
-    layer
     dieTime
     restTime
 
-    image
-    rect
     """
-    color = (154, 189, 225, 255)
+    color = glcolor(154, 189, 225, 255)
     reflective = False
     moveable = True
-    layer = 10
     dieTime = 10
     field = None
 
     def __init__(self, pos=(0, 0), orient=(1, 0)):
-        super(Sprite, self).__init__()
-        self.pos = pos
+        super(Item, self).__init__(pos)
         self.orient = orient
-        self.image = None
-        self.rect = None
         self.restTime = None
-
-    def update(self):
-        if self.image is None:
-            self.image = image = pygame.Surface(GRID_SIZE).convert_alpha()
-            image.fill(self.color)
-            x, y = self.pos
-            self.rect = pygame.Rect((0, 0), GRID_SIZE)
-            self.rect.topleft = x * GRID_SIZE[0], y * GRID_SIZE[1]
 
     def move(self, direction):
         x, y = self.pos
         dx, dy = direction
         self.pos = x, y = x + dx, y + dy
-        self.rect.topleft = x * GRID_SIZE[0], y * GRID_SIZE[1]
+
+    def kill(self):
+        self.alive = False
 
     @property
     def dying(self):
@@ -66,32 +79,56 @@ class Sprite(pygame.sprite.Sprite):
             if self.restTime == 0:
                 self.kill()
                 self.field.remove_sprite(self)
-            elif self.restTime % 2:
-                self.image.fill(self.color)
+
+    def draw(self):
+        glTranslate(0, 0, .5)
+        if self.dying:
+            if self.restTime % 2:
+                color = self.color
             else:
-                self.image.fill(alpha(self.color, 0x88))
+                color = (.3, .2, .2, .2)
+        else:
+            color = self.color
+        glColor4dv(color)
+        glutSolidCube(0.8)
 
-class Player(Sprite):
-    color = (69, 161, 17, 0xff)
-
-class Mirror(Sprite):
-    color = (168, 255, 235, 0xff)
-    reflective = True
+class Player(Item):
+    color = glcolor(69, 161, 17, 0xff)
+    t = 0
 
     def update(self):
-        if self.image is None:
-            Sprite.update(self)
-            ox, oy = self.orient
-            d = (ox*ox + oy*oy)**.5
-            w2 = self.rect.width / 2
-            ox *= w2 / d
-            oy *= w2 / d
-            p1 = (int(w2-oy), int(w2+ox))
-            p2 = (int(w2+oy), int(w2-ox))
-            pygame.draw.line(self.image, (0, 0, 0, 0xff), p1, p2, 3)
+        self.t += 1
+        self.t %= FPS * 10
+        self.h = 0.1 * math.sin(math.pi * 2 * self.t / FPS)
 
-class Emitter(Sprite):
-    color = (147, 17, 161, 0xff)
+    def draw(self):
+        glTranslate(0, 0, self.h)
+        super(Player, self).draw()
+
+class Mirror(Item):
+    color = glcolor(168, 255, 235, 0xff)
+    reflective = True
+
+    def draw(self):
+        angle = math.degrees(math.atan2(self.orient[1], self.orient[0]))
+
+        # draw mirror base
+        glColor3d(0., 0., 0.)
+        glPushMatrix()
+        glScale(1., 1., .2)
+        glutSolidCube(1)
+        glPopMatrix()
+        # draw mirror
+        glColor4dv(self.color)
+        glPushMatrix()
+        glTranslate(0, 0, .5)
+        glRotate(angle, 0, 0, 1)
+        glScale(0.1, 1, 1)
+        glutSolidCube(1)
+        glPopMatrix()
+
+class Emitter(Item):
+    color = glcolor(147, 17, 161, 0xff)
     MAX_LENGTH = 1000
     def calculate(self, field):
         x, y = self.pos
@@ -122,22 +159,43 @@ class Emitter(Sprite):
             x, y = p1
         light.end = item
 
-class Goal(Sprite):
-    color = (0xff, 0, 0, 0xff)
+class Goal(Item):
+    color = glcolor(0xff, 0, 0, 0xff)
 
 class Light:
+    color = glcolor(0xee, 0, 0, 0x88)
     def __init__(self):
         self.nodes = []
 
     def die(self):
         pass
 
-class Bomb(Sprite):
-    color = (226, 56, 58, 0xff)
+class Bomb(Item):
+    color = glcolor(226, 56, 58, 0xff)
 
-class Obstacle(Sprite):
+class Obstacle(Item):
     moveable = False
-    color = (74, 80, 72, 0xff)
+    color = glcolor(74, 80, 72, 0xff)
 
     def die(self):
         pass
+
+class Lights(Sprite):
+    def __init__(self):
+        super(Lights, self).__init__()
+
+    def redraw(self, emitters):
+        gw, gh = GRID_SIZE
+        self.lights = []
+        for emitter in emitters:
+            light = emitter.light
+            self.lights.append(light)
+
+    def draw(self):
+        for light in self.lights:
+            glColor4dv(light.color)
+            glBegin(GL_LINE_STRIP)
+            for p in light.nodes:
+                x, y = p
+                glVertex3d(x, y, .5)
+            glEnd()
