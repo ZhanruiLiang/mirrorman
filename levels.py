@@ -1,4 +1,4 @@
-from sprites import Emitter, Bomb, Obstacle, Player, Mirror
+from sprites import Emitter, Bomb, Obstacle, Player, Mirror, Goal
 from config import GRID_SIZE
 import pygame
 
@@ -37,6 +37,7 @@ class Field(pygame.sprite.Sprite):
         x, y = sp.pos
         assert (x, y) not in self._map, "{} already has {}".format((x, y), self._map[x, y])
         self._map[(x, y)] = sp
+        sp.field = self
 
     def get_sprite_at(self, pos):
         x, y = pos
@@ -112,13 +113,17 @@ class Level_test_2(Level):
         Level.__init__(self, 'test level 2', (12, 11))
         A = self.add
 
-        A(Player(pos=(4, 6)))
+        A(Player(pos=(4, 7)))
         A(Emitter(pos=(2, 9), orient=(0, -1)))
+        A(Emitter(pos=(9, 8), orient=(-1, 0)))
+        A(Obstacle(pos=(6, 1)))
+        A(Obstacle(pos=(7, 1)))
+        A(Obstacle(pos=(8, 1)))
         A(Mirror(pos=(2, 2), orient=(1, 1)))
         A(Mirror(pos=(9, 2), orient=(-1, 1)))
         A(Mirror(pos=(9, 6), orient=(-1, -1)))
-        A(Mirror(pos=(2, 6), orient=(1, -1)))
         A(Mirror(pos=(4, 1), orient=(0, 1)))
+        A(Goal(pos=(5, 1), orient=(0, 1)))
 
         self.collect()
 

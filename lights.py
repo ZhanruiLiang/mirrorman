@@ -25,3 +25,4 @@ class Lights(pygame.sprite.Sprite):
             pygame.draw.lines(image, emitter.color, False, ps, 4)
             for p in ps:
                 pygame.draw.circle(image, emitter.color, p, 5)
+

@@ -1,11 +1,16 @@
 import pygame
 import sys
 import config
+import display
+from display import Display
+from sprites import Goal
 from levels import Level, levels
 from lights import Lights
 
 def move((x, y), (dx, dy)):
     return x + dx, y + dy
+
+display.init()
 
 class Game:
     def __init__(self):
@@ -17,6 +22,8 @@ class Game:
         item1 = self.field.get_sprite_at((x, y))
         canGo = True
         if item1:
+            if isinstance(item1, Goal):
+                self.end_game(True)
             if not item1.moveable:
                 canGo = False
             else:
@@ -39,12 +46,20 @@ class Game:
         # self.bombs = level.bombs
 
     def init_display(self):
-        display = self.display = pygame.sprite.LayeredUpdates()
+        display = self.display = Display()
         display.add(self.field)
         for sp in self.field:
             display.add(sp)
         lights = self.lights = Lights(self.field.image.get_size())
         display.add(lights)
+
+    def end_game(self, win):
+        self._ended = True
+        self._win = win
+        if win:
+            self.display.hint('You win. Press q to quit.')
+        else:
+            self.display.hint('You was killed by ray, press q to quit')
 
     def play(self, level):
         self.load_level(level)
@@ -53,6 +68,7 @@ class Game:
         display = self.display
         self._quit = False
         self._win = False
+        self._ended = False
         self._dirty = True
         timer = pygame.time.Clock()
         fcnt = 0
@@ -64,20 +80,30 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     key = event.key
                     if key == pygame.K_q:
-                        exit(0)
+                        self._quit = True
                     newDir = config.Dirs.get(key, None)
-            if fcnt % config.DD == 0:
+            # update logic
+            if not self._ended and fcnt % config.DD == 0:
                 # update player pos
                 if newDir:
                     self.move_player(self.player, newDir)
                     newDir = None
-                if self._dirty:
-                    self._dirty = False
-                    # recalculate lights
-                    for emitter in self.emitters:
-                        emitter.calculate(self.field)
-                    self.lights.redraw(self.emitters)
-            # update screen
+                # recalculate lights
+                onHeats = []
+
+                for emitter in self.emitters:
+                    emitter.calculate(self.field)
+                    end = emitter.light.end
+                    if end and not end.dying:
+                        end.die()
+                self.emitters = [x for x in self.emitters if x.alive()]
+                self.lights.redraw(self.emitters)
+                for sp in display:
+                    if hasattr(sp, 'update2'):
+                        sp.update2()
+                if self.player.dying:
+                    self.end_game(False)
+            # update display
             display.update()
             display.draw(self.screen)
             pygame.display.update()
@@ -85,7 +111,5 @@ class Game:
             timer.tick(config.FPS)
             fcnt += 1
 
-pygame.display.init()
-pygame.font.init()
 game = Game()
 game.play(levels[-1]())
