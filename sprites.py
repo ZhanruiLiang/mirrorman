@@ -3,7 +3,7 @@ import math
 from config import GRID_SIZE, FPS
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-
+import shapes
 
 __meta__ = type
 
@@ -90,7 +90,11 @@ class Item(Sprite):
         else:
             color = self.color
         glColor4dv(color)
-        glutSolidCube(0.8)
+        glutSolidSphere(0.4,50,50)
+        # glPushMatrix()
+        # glScalef(.8,.8,.8)
+        # shapes.cylindar()
+        # glPopMatrix()
 
 class Player(Item):
     color = glcolor(69, 161, 17, 0xff)
