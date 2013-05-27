@@ -50,13 +50,14 @@ class cylindarShape:
             for j in range(3): self.cylindarN.append(vc)
 
         self.cylindarI = range(len(self.cylindarV))
-        glEnableClientState(GL_VERTEX_ARRAY)
-        glEnableClientState(GL_NORMAL_ARRAY)
-        glVertexPointer(3,GL_FLOAT,0,self.cylindarV)
-        glNormalPointer(GL_FLOAT,0,self.cylindarN)
+        self.init = False
 
 
     def draw(self):
-
-
-        glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_BYTE,self.cylindarI)
+        if self.init == False:
+            glEnableClientState(GL_VERTEX_ARRAY)
+            glEnableClientState(GL_NORMAL_ARRAY)
+            glVertexPointer(3,GL_FLOAT,0,self.cylindarV)
+            glNormalPointer(GL_FLOAT,0,self.cylindarN)
+            self.init = True
+        glDrawElements(GL_TRIANGLES,len(self.cylindarI),GL_UNSIGNED_BYTE,self.cylindarI)
