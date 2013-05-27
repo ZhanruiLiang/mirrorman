@@ -3,9 +3,11 @@ import math
 from config import GRID_SIZE, FPS
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-
+import shapes
 
 __meta__ = type
+
+cylindar = shapes.cylindarShape()
 
 def alpha(color, a):
     if len(color) == 3:
@@ -27,6 +29,7 @@ class Sprite(object):
     kill()
     """
     def __init__(self, pos=(0, 0)):
+
         self.pos = pos
         self.alive = True
 
@@ -90,7 +93,11 @@ class Item(Sprite):
         else:
             color = self.color
         glColor4dv(color)
-        glutSolidCube(0.8)
+        #glutSolidSphere(0.4,50,50)
+        glPushMatrix()
+        glScalef(.8,.8,.8)
+        cylindar.draw()
+        glPopMatrix()
 
 class Player(Item):
     color = glcolor(69, 161, 17, 0xff)
