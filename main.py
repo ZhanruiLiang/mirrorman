@@ -42,7 +42,7 @@ class Game:
         # self.bombs = level.bombs
 
     def init_display(self):
-        display = self.display = Display()
+        display = self.display = Display(self.field.size)
         display.add(self.field)
         for sp in self.field:
             display.add(sp)

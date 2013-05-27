@@ -67,8 +67,10 @@ class Field(Sprite):
 
     def draw(self):
         glScale(self.size[0], self.size[1], 0.01)
+        glDisable(GL_LIGHTING)
         glColor3d(.6, .6, .5)
         glutSolidCube(1)
+        glEnable(GL_LIGHTING)
 
 class Level:
     """
@@ -128,7 +130,7 @@ class Level_test_2(Level):
         A(Mirror(pos=(2, 2), orient=(1, 1)))
         A(Mirror(pos=(9, 2), orient=(-1, 1)))
         A(Mirror(pos=(9, 6), orient=(-1, -1)))
-        A(Mirror(pos=(4, 1), orient=(0, 1)))
+        A(Mirror(pos=(4, 3), orient=(0, 1)))
         A(Goal(pos=(5, 0), orient=(0, 1)))
 
         self.collect()

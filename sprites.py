@@ -17,7 +17,7 @@ def alpha(color, a):
     return (r, g, b, a)
 
 def glcolor(r, g, b, a):
-    return r/255., g/255., b/255., a/255.
+    return float(r)/255., float(g)/255., float(b)/255., float(a)/255.
 
 class Sprite(object):
     """
@@ -83,6 +83,11 @@ class Item(Sprite):
                 self.kill()
                 self.field.remove_sprite(self)
 
+    def setMaterial(self, color):
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color)
+        glMaterialfv(GL_FRONT, GL_SPECULAR, color)
+        glMaterialf(GL_FRONT, GL_SHININESS, .5)
+
     def draw(self):
         glTranslate(0, 0, .5)
         if self.dying:
@@ -92,11 +97,13 @@ class Item(Sprite):
                 color = (.3, .2, .2, .2)
         else:
             color = self.color
-        glColor4dv(color)
+        #glColor4dv(color)
+        self.setMaterial(color)
         #glutSolidSphere(0.4,50,50)
         glPushMatrix()
         glScalef(.8,.8,.8)
         cylindar.draw()
+        #glutSolidTorus(.1,.4,15,15)
         glPopMatrix()
 
 class Player(Item):
@@ -120,13 +127,22 @@ class Mirror(Item):
         angle = math.degrees(math.atan2(self.orient[1], self.orient[0]))
 
         # draw mirror base
-        glColor3d(0., 0., 0.)
+        self.setMaterial((.0,.0,.0,.0))
+        #glColor4f(0., 0., 0., 0.)
         glPushMatrix()
         glScale(1., 1., .2)
         glutSolidCube(1)
         glPopMatrix()
         # draw mirror
-        glColor4dv(self.color)
+        #glColor4fv(self.color)
+        if self.dying:
+            if self.restTime % 2:
+                color = self.color
+            else:
+                color = (.3, .2, .2, .2)
+        else:
+            color = self.color
+        self.setMaterial(color)
         glPushMatrix()
         glTranslate(0, 0, .5)
         glRotate(angle, 0, 0, 1)
@@ -199,10 +215,12 @@ class Lights(Sprite):
             self.lights.append(light)
 
     def draw(self):
+        glDisable(GL_LIGHTING)
         for light in self.lights:
-            glColor4dv(light.color)
+            glColor4fv(light.color)
             glBegin(GL_LINE_STRIP)
             for p in light.nodes:
                 x, y = p
                 glVertex3d(x, y, .5)
             glEnd()
+        glEnable(GL_LIGHTING)
