@@ -55,6 +55,9 @@ class Display(object):
         self.reshape()
         glMatrixMode(GL_MODELVIEW)
 
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_NORMAL_ARRAY)
+
         self.sprites = []
 
     def reshape(self):
