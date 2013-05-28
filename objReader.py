@@ -1,97 +1,61 @@
 import utils
 import pygame
 import os
-import hashlib
-import cPickle
 from OpenGL.GL import *
 from utils import Timer
 
 baseDir = "models"
-cacheDir = "models/cache"
-
-FORCE_RELOAD = True
-
-def cal_hash(data):
-    hasher = hashlib.sha256()
-    hasher.update(data)
-    return hasher.digest()
 
 class Model(object):
-    CachedAttrs = ['vertices', 'normals', 'texcoords', 'indices', 'mtlName']
-
-    def read_cache(self):
-        if FORCE_RELOAD: return False
-        cacheDataPath = os.path.join(cacheDir, self.name)
-        if os.path.exists(cacheDataPath):
-            cachedHashVal, cachedData = cPickle.load(open(cacheDataPath, 'rb'))
-            if cachedHashVal == self.hashVal:
-                for attr in self.CachedAttrs:
-                    setattr(self, attr, cachedData[attr])
-                return True
-        return False
-
-    def write_cache(self):
-        data = {attr:getattr(self, attr) for attr in self.CachedAttrs}
-
-        with open(os.path.join(cacheDir, self.name), 'wb') as outf:
-            cPickle.dump((self.hashVal, data), outf, -1)
-
     def __init__(self, filename):
         tm = Timer()
-        dataFile = open(os.path.join(baseDir, filename), "r")
-        self.hashVal = cal_hash(dataFile.read())
-        self.name = filename
+        vertices = []
+        normals = []
+        texcoords = []
+        self.mtlName = ''
+        self.vertices = []
+        self.normals = []
+        self.texcoords = []
+        self.indices = []
+        self.material = None
 
-        if not self.read_cache():
-            vertices = []
-            normals = []
-            texcoords = []
-            self.mtlName = ''
-            self.vertices = []
-            self.normals = []
-            self.texcoords = []
-            self.indices = []
-            self.material = None
-
-            for line in open(os.path.join(baseDir, filename), "r"):
-                if line.startswith('#'): continue
-                v = line.split()
-                if not v: continue
-                if v[0] == 'v':
-                    assert len(v) == 4
-                    v = map(float, v[1:4])
-                    vertices.append(v)
-                elif v[0] == 'vn':
-                    assert len(v) == 4
-                    v = map(float, v[1:4])
-                    normals.append(v)
-                elif v[0] == 'vt':
-                    assert len(v) == 3
-                    v = map(float, v[1:3])
-                    texcoords.append(v)
-                elif v[0] == 'mtllib':
-                    self.mtlName = v[1]
-                elif v[0] == 'f':
-                    assert len(v) == 4, "use triangle face please!"
-                    for i in range(1, 4):
-                        temp = map(int, v[i].split('/'))
-                        assert len(temp) == 3, "face must have vertice, normal, texture index"
-                        self.vertices.append(vertices[temp[0]-1])
-                        self.texcoords.append(texcoords[temp[1]-1])
-                        self.normals.append(normals[temp[2]-1])
-            self.indices = utils.convert_ctypes(
-                self.indices, ctypes.c_uint, (len(self.indices), ))
-            self.vertices = utils.convert_ctypes(
-                self.vertices, ctypes.c_float, (len(self.vertices), 3))
-            self.texcoords = utils.convert_ctypes(
-                self.texcoords, ctypes.c_float, (len(self.texcoords), 2))
-            self.normals = utils.convert_ctypes(
-                self.normals, ctypes.c_float, (len(self.normals), 3))
-            self.indices = range(len(self.vertices))
-            print 'type convertion time {}'.format(tm.tick())
-            self.write_cache()
-
+        for line in open(os.path.join(baseDir, filename), "r"):
+            if line.startswith('#'): continue
+            v = line.split()
+            if not v: continue
+            if v[0] == 'v':
+                assert len(v) == 4
+                v = map(float, v[1:4])
+                vertices.append(v)
+            elif v[0] == 'vn':
+                assert len(v) == 4
+                v = map(float, v[1:4])
+                normals.append(v)
+            elif v[0] == 'vt':
+                assert len(v) == 3
+                v = map(float, v[1:3])
+                texcoords.append(v)
+            elif v[0] == 'mtllib':
+                self.mtlName = v[1]
+            elif v[0] == 'f':
+                assert len(v) == 4, "use triangle face please!"
+                for i in range(1, 4):
+                    temp = map(int, v[i].split('/'))
+                    assert len(temp) == 3, "face must have vertice, normal, texture index"
+                    self.vertices.append(vertices[temp[0]-1])
+                    self.texcoords.append(texcoords[temp[1]-1])
+                    self.normals.append(normals[temp[2]-1])
         print 'obj: {}, load time {}'.format(filename, tm.tick())
+        self.indices = range(len(self.vertices))
+        self.indices = utils.convert_ctypes(
+            self.indices, ctypes.c_uint, (len(self.indices), ))
+        self.vertices = utils.convert_ctypes(
+            self.vertices, ctypes.c_float, (len(self.vertices), 3))
+        self.texcoords = utils.convert_ctypes(
+            self.texcoords, ctypes.c_float, (len(self.texcoords), 2))
+        self.normals = utils.convert_ctypes(
+            self.normals, ctypes.c_float, (len(self.normals), 3))
+        print 'type convertion time {}'.format(tm.tick())
 
         self.material = Material(self.mtlName)
     
