@@ -3,12 +3,11 @@ from OpenGL.GLU import *
 from OpenGL.GL import *
 import config
 import pygame
+from utils import Timer
 
 
 def init():
-    # glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
     pygame.display.init()
-    # pygame.init()
 
     glutInit()
 
@@ -18,6 +17,7 @@ class Hint(pygame.sprite.Sprite):
 
 class Display(object):
     def __init__(self,fieldSize):
+        tm = Timer()
         self.size = config.SCREEN_SIZE
         self.fieldSize = fieldSize
         self.screen = pygame.display.set_mode(config.SCREEN_SIZE, 
@@ -63,7 +63,7 @@ class Display(object):
         glEnableClientState(GL_TEXTURE_COORD_ARRAY)
 
         self.sprites = []
-
+        print 'Display init time:', tm.tick()
 
     def reshape(self):
         w, h = self.size

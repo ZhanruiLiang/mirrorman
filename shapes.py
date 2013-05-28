@@ -29,25 +29,25 @@ class cylindarShape:
             nx = math.cos(2*PI*(i+1)/splitNum) / 2
             ny = math.sin(2*PI*(i+1)/splitNum) / 2
             #rectangle
-            cylindarV.append((x,y,.5))
-            cylindarV.append((nx,ny,.5))
-            cylindarV.append((nx,ny,-.5))
-            cylindarV.append((x,y,.5))
-            cylindarV.append((nx,ny,-.5))
-            cylindarV.append((x,y,-.5))
-            vc = calculateNormal((.0,.0,-1.),(nx-x,ny-y,.0))
+            cylindarV.append((x, y, .5))
+            cylindarV.append((nx, ny, .5))
+            cylindarV.append((nx, ny, -.5))
+            cylindarV.append((x, y, .5))
+            cylindarV.append((nx, ny, -.5))
+            cylindarV.append((x, y, -.5))
+            vc = calculateNormal((.0, .0, -1.), (nx-x, ny-y, .0))
             for j in range(6): cylindarN.append(vc)
             #upper triangle
-            cylindarV.append((.0,.0,.5))
-            cylindarV.append((x,y,.5))
-            cylindarV.append((nx,ny,.5))
-            vc = calculateNormal((x,y,.0),(nx,ny,.0))
+            cylindarV.append((.0, .0, .5))
+            cylindarV.append((x, y, .5))
+            cylindarV.append((nx, ny, .5))
+            vc = calculateNormal((x, y, .0), (nx, ny, .0))
             for j in range(3): cylindarN.append(vc)
             #lower triangle
-            cylindarV.append((.0,.0,-.5))
-            cylindarV.append((x,y,-.5))
-            cylindarV.append((nx,ny,-.5))
-            vc = calculateNormal((nx,ny,.0),(x,y,.0))
+            cylindarV.append((.0, .0, -.5))
+            cylindarV.append((x, y, -.5))
+            cylindarV.append((nx, ny, -.5))
+            vc = calculateNormal((nx, ny, .0), (x, y, .0))
             for j in range(3): cylindarN.append(vc)
 
         self.cylindarV = utils.convert_ctypes(cylindarV, 
@@ -55,27 +55,27 @@ class cylindarShape:
         self.cylindarN = utils.convert_ctypes(cylindarN, 
                 ctypes.c_float, (len(cylindarN), 3))
         self.cylindarI = utils.convert_ctypes(range(len(cylindarV)),
-                ctypes.c_uint, (len(cylindarV),))
+                ctypes.c_uint, (len(cylindarV), ))
 
     def draw(self):
         glDisableClientState(GL_TEXTURE_COORD_ARRAY)
         glDisable(GL_TEXTURE_2D)
-        glVertexPointer(3,GL_FLOAT,0,self.cylindarV)
-        glNormalPointer(GL_FLOAT,0,self.cylindarN)
-        glDrawElements(GL_TRIANGLES,len(self.cylindarI),GL_UNSIGNED_INT,self.cylindarI)
+        glVertexPointer(3, GL_FLOAT, 0, self.cylindarV)
+        glNormalPointer(GL_FLOAT, 0, self.cylindarN)
+        glDrawElements(GL_TRIANGLES, len(self.cylindarI), GL_UNSIGNED_INT, self.cylindarI)
 
-class PlayerShape(OBJ):
+class PlayerShape(Model):
     def __init__(self):
-        super(PlayerShape,self).__init__("capsule.obj")
+        super(PlayerShape, self).__init__("capsule.obj")
 
     def draw(self):
         glEnableClientState(GL_TEXTURE_COORD_ARRAY)
         glEnable(GL_TEXTURE_2D)
-        glVertexPointer(3,GL_FLOAT,0,self.vertices)
-        glNormalPointer(GL_FLOAT,0,self.normals)
-        glTexCoordPointer(2,GL_FLOAT,0,self.texcoords)
+        glVertexPointer(3, GL_FLOAT, 0, self.vertices)
+        glNormalPointer(GL_FLOAT, 0, self.normals)
+        glTexCoordPointer(2, GL_FLOAT, 0, self.texcoords)
         glBindTexture(GL_TEXTURE_2D, self.material.texid)
-        glDrawElements(GL_TRIANGLES,len(self.indices),GL_UNSIGNED_INT,
+        glDrawElements(GL_TRIANGLES, len(self.indices), GL_UNSIGNED_INT,
                        self.indices)
         glDisableClientState(GL_TEXTURE_COORD_ARRAY)
         

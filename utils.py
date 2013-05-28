@@ -1,4 +1,6 @@
 import ctypes
+from pygame.time import Clock
+import numpy
 
 def convert_ctypes(a, type, shape):
     Arr = type
@@ -14,6 +16,8 @@ def convert_ctypes(a, type, shape):
                 b[i] = x
     assign(a, b)
     return b
+
+Timer = Clock
 
 if __name__ == '__main__':
     a = [[1, 2, 3],
