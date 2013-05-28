@@ -11,6 +11,10 @@ def convert_ctypes(a, type, shape):
         if len(bShape) == 1:
             for i in xrange(bShape[0]):
                 b[i] = a[i]
+        elif len(shape) == 2:
+            for i in xrange(shape[0]):
+                for j in xrange(shape[1]):
+                    b[i][j] = a[i][j]
         else:
             for i in xrange(bShape[0]):
                 assign(a[i], b[i], bShape[1:])
