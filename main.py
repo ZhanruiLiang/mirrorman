@@ -3,9 +3,8 @@ import sys
 import config
 import display
 from display import Display
-from sprites import Goal
+from sprites import Goal, Lights
 from levels import Level, levels
-from lights import Lights
 
 def move((x, y), (dx, dy)):
     return x + dx, y + dy
@@ -13,9 +12,6 @@ def move((x, y), (dx, dy)):
 display.init()
 
 class Game:
-    def __init__(self):
-        self.screen = pygame.display.set_mode(config.SCREEN_SIZE, 0, 32)
-
     def move_player(self, player, direction):
         x0, y0 = player.pos
         x, y = move(player.pos, direction)
@@ -46,11 +42,11 @@ class Game:
         # self.bombs = level.bombs
 
     def init_display(self):
-        display = self.display = Display()
+        display = self.display = Display(self.field.size)
         display.add(self.field)
         for sp in self.field:
             display.add(sp)
-        lights = self.lights = Lights(self.field.image.get_size())
+        lights = self.lights = Lights()
         display.add(lights)
 
     def end_game(self, win):
@@ -59,7 +55,7 @@ class Game:
         if win:
             self.display.hint('You win. Press q to quit.')
         else:
-            self.display.hint('You was killed by ray, press q to quit')
+            self.display.hint('You were killed by ray, press q to quit')
 
     def play(self, level):
         self.load_level(level)
@@ -96,7 +92,7 @@ class Game:
                     end = emitter.light.end
                     if end and not end.dying:
                         end.die()
-                self.emitters = [x for x in self.emitters if x.alive()]
+                self.emitters = [x for x in self.emitters if x.alive]
                 self.lights.redraw(self.emitters)
                 for sp in display:
                     if hasattr(sp, 'update2'):
@@ -105,8 +101,6 @@ class Game:
                     self.end_game(False)
             # update display
             display.update()
-            display.draw(self.screen)
-            pygame.display.update()
             # tick
             timer.tick(config.FPS)
             fcnt += 1
