@@ -1,20 +1,20 @@
 import ctypes
 from pygame.time import Clock
-import numpy
 
 def convert_ctypes(a, type, shape):
     Arr = type
     for n in reversed(shape):
         Arr = Arr * n
     b = Arr()
-    def assign(a, b):
-        for i, x in enumerate(a):
-            try: 
-                iter(x)
-                assign(x, b[i])
-            except: 
-                b[i] = x
-    assign(a, b)
+    def assign(a, b, bShape):
+        # assign a to b
+        if len(bShape) == 1:
+            for i in xrange(bShape[0]):
+                b[i] = a[i]
+        else:
+            for i in xrange(bShape[0]):
+                assign(a[i], b[i], bShape[1:])
+    assign(a, b, shape)
     return b
 
 Timer = Clock
