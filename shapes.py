@@ -3,6 +3,7 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 import utils
 import ctypes
+import config
 from objReader import *
 
 PI = math.acos(-1.0)
@@ -66,7 +67,7 @@ class cylindarShape:
 
 class PlayerShape(Model):
     def __init__(self):
-        super(PlayerShape, self).__init__("capsule.obj")
+        super(PlayerShape, self).__init__(config.PLAYER_MODEL)
 
     def draw(self):
         glEnableClientState(GL_TEXTURE_COORD_ARRAY)

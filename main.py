@@ -3,7 +3,7 @@ import sys
 import config
 import display
 from display import Display
-from sprites import Goal, Lights, spritesInit
+from sprites import Goal, Lights
 from levels import Level, levels
 import shapes
 
@@ -37,6 +37,7 @@ class Game:
             self._dirty = True
 
     def load_level(self, level):
+        self.display = Display()
         self.field = level.field
         self.player = level.player
         self.emitters = level.emitters
@@ -44,7 +45,7 @@ class Game:
         # self.bombs = level.bombs
 
     def init_display(self):
-        display = self.display = Display(self.field.size)
+        display = self.display
         display.add(self.field)
         for sp in self.field:
             display.add(sp)
@@ -71,7 +72,6 @@ class Game:
         fcnt = 0
         newDir = None
 
-        spritesInit()
         while not self._quit:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

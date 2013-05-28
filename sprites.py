@@ -8,11 +8,6 @@ import shapes
 __meta__ = type
 
 cylindar = shapes.cylindarShape()
-playerShape = None
-def spritesInit():
-    global playerShape
-    playerShape = shapes.PlayerShape()
-
 
 def alpha(color, a):
     if len(color) == 3:
@@ -115,17 +110,28 @@ class Player(Item):
     color = glcolor(69, 161, 17, 0xff)
     t = 0
 
+    def __init__(self, *args, **kwargs):
+        super(Player, self).__init__(*args, **kwargs)
+        self.shape = shapes.PlayerShape()
+
     def update(self):
         self.t += 1
         self.t %= FPS * 10
         self.h = 0.1 * math.sin(math.pi * 2 * self.t / FPS)
 
+    def move(self, direction):
+        dx, dy = direction
+        self.orient = (dx, dy)
+        super(Player, self).move(direction)
+
     def draw(self):
         glTranslate(0, 0, self.h)
         glPushMatrix()
-        glTranslate(.0,.0,.5)
-        glScale(.5,.5, .2)
-        playerShape.draw()
+        glTranslate(.0, .0, .5)
+        glScale(.5, .5, .2)
+        ox, oy = self.orient
+        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
+        self.shape.draw()
         glPopMatrix()
 
 
