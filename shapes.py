@@ -3,6 +3,7 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 import utils
 import ctypes
+from objReader import *
 
 PI = math.acos(-1.0)
 
@@ -57,6 +58,24 @@ class cylindarShape:
                 ctypes.c_uint, (len(cylindarV),))
 
     def draw(self):
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+        glDisable(GL_TEXTURE_2D)
         glVertexPointer(3,GL_FLOAT,0,self.cylindarV)
         glNormalPointer(GL_FLOAT,0,self.cylindarN)
         glDrawElements(GL_TRIANGLES,len(self.cylindarI),GL_UNSIGNED_INT,self.cylindarI)
+
+class PlayerShape(OBJ):
+    def __init__(self):
+        super(PlayerShape,self).__init__("capsule.obj")
+
+    def draw(self):
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY)
+        glEnable(GL_TEXTURE_2D)
+        glVertexPointer(3,GL_FLOAT,0,self.vertices)
+        glNormalPointer(GL_FLOAT,0,self.normals)
+        glTexCoordPointer(2,GL_FLOAT,0,self.texcoords)
+        glBindTexture(GL_TEXTURE_2D, self.material.texid)
+        glDrawElements(GL_TRIANGLES,len(self.indices),GL_UNSIGNED_INT,
+                       self.indices)
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+        

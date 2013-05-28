@@ -4,6 +4,7 @@ from OpenGL.GL import *
 import config
 import pygame
 
+
 def init():
     # glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
     pygame.display.init()
@@ -23,6 +24,8 @@ class Display(object):
                 pygame.HWSURFACE | pygame.OPENGL | pygame.DOUBLEBUF)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_RESCALE_NORMAL)
+        glEnable(GL_TEXTURE_2D)
+
 
         #glEnable(GL_COLOR_MATERIAL)
         #glColorMaterial(GL_FRONT,GL_AMBIENT_AND_DIFFUSE)
@@ -57,8 +60,10 @@ class Display(object):
 
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY)
 
         self.sprites = []
+
 
     def reshape(self):
         w, h = self.size
@@ -101,6 +106,7 @@ class Display(object):
 
         self.sprites = [sp for sp in self.sprites if sp.alive]
 
+        #see light location
         glPushMatrix()
         glTranslate(self.lightPos[0],self.lightPos[1],self.lightPos[2])
         glutSolidCube(0.2)

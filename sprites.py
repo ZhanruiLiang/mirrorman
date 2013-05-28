@@ -8,6 +8,11 @@ import shapes
 __meta__ = type
 
 cylindar = shapes.cylindarShape()
+playerShape = None
+def spritesInit():
+    global playerShape
+    playerShape = shapes.PlayerShape()
+
 
 def alpha(color, a):
     if len(color) == 3:
@@ -117,7 +122,12 @@ class Player(Item):
 
     def draw(self):
         glTranslate(0, 0, self.h)
-        super(Player, self).draw()
+        glPushMatrix()
+        glTranslate(.0,.0,.5)
+        glScale(.5,.5, .2)
+        playerShape.draw()
+        glPopMatrix()
+
 
 class Mirror(Item):
     color = glcolor(168, 255, 235, 0xff)

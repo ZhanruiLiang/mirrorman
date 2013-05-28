@@ -3,13 +3,15 @@ import sys
 import config
 import display
 from display import Display
-from sprites import Goal, Lights
+from sprites import Goal, Lights, spritesInit
 from levels import Level, levels
+import shapes
 
 def move((x, y), (dx, dy)):
     return x + dx, y + dy
 
 display.init()
+
 
 class Game:
     def move_player(self, player, direction):
@@ -60,7 +62,6 @@ class Game:
     def play(self, level):
         self.load_level(level)
         self.init_display()
-
         display = self.display
         self._quit = False
         self._win = False
@@ -69,6 +70,8 @@ class Game:
         timer = pygame.time.Clock()
         fcnt = 0
         newDir = None
+
+        spritesInit()
         while not self._quit:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -104,6 +107,7 @@ class Game:
             # tick
             timer.tick(config.FPS)
             fcnt += 1
+
 
 game = Game()
 game.play(levels[-1]())
