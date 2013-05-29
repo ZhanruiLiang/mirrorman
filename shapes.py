@@ -3,6 +3,7 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 import utils
 import ctypes
+import config
 from objReader import *
 
 PI = math.acos(-1.0)
@@ -65,7 +66,7 @@ class cylindarShape:
 
 class BasicShape(Model):
     def __init__(self):
-        super(BasicShape, self).__init__("capsule.obj")
+        super(BasicShape, self).__init__(config.PLAYER_MODEL)
 
     def draw(self):
         glEnable(GL_TEXTURE_2D)

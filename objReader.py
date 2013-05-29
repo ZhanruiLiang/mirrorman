@@ -1,6 +1,6 @@
 import utils
 import pygame
-import os
+import os, sys
 from OpenGL.GL import *
 from utils import Timer
 

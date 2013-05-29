@@ -3,7 +3,7 @@ import sys
 import config
 import display
 from display import Display
-from sprites import Goal, Lights, sprites_init
+from sprites import Goal, Lights
 from levels import Level, levels
 import shapes
 
@@ -11,7 +11,7 @@ def move((x, y), (dx, dy)):
     return x + dx, y + dy
 
 display.init()
-pygame.display.gl_set_attribute(pygame.GL_STENCIL_SIZE, 2)
+
 
 class Game:
     def move_player(self, player, direction):
@@ -37,6 +37,7 @@ class Game:
             self._dirty = True
 
     def load_level(self, level):
+        self.display = Display()
         self.field = level.field
         self.player = level.player
         self.emitters = level.emitters
@@ -44,7 +45,7 @@ class Game:
         # self.bombs = level.bombs
 
     def init_display(self):
-        display = self.display = Display(self.field.size)
+        display = self.display
         #display.add(self.field)
         for sp in self.field:
             display.add(sp)
@@ -71,7 +72,7 @@ class Game:
         fcnt = 0
         newDir = None
 
-        sprites_init()
+
         while not self._quit:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

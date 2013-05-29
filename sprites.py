@@ -8,11 +8,6 @@ import shapes
 __meta__ = type
 
 cylindar = shapes.cylindarShape()
-playerShape = None
-def sprites_init():
-    global playerShape
-    playerShape = shapes.BasicShape()
-
 
 def alpha(color, a):
     if len(color) == 3:
@@ -115,17 +110,28 @@ class Player(Item):
     color = glcolor(69, 161, 17, 0xff)
     t = 0
 
+    def __init__(self, *args, **kwargs):
+        super(Player, self).__init__(*args, **kwargs)
+        self.shape = shapes.BasicShape()
+
     def update(self):
         self.t += 1
         self.t %= FPS * 10
         self.h = 0.1 * math.sin(math.pi * 2 * self.t / FPS)
 
+    def move(self, direction):
+        dx, dy = direction
+        self.orient = (dx, dy)
+        super(Player, self).move(direction)
+
     def draw(self):
         glTranslate(0, 0, self.h)
         glPushMatrix()
-        glTranslate(.0,.0,.5)
-        glScale(.5,.5, .2)
-        playerShape.draw()
+        glTranslate(.0, .0, .5)
+        glScale(.5, .5, .2)
+        ox, oy = self.orient
+        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
+        self.shape.draw()
         glPopMatrix()
 
 
@@ -169,7 +175,7 @@ class Emitter(Item):
         alive = True
         light = self.light = Light()
         light.nodes.append((x, y))
-        vis = {(x, y)}
+        vis = {((x, y), (dx, dy))}
         cnt = 0 
         item = None
         while alive and cnt < self.MAX_LENGTH:
@@ -187,8 +193,8 @@ class Emitter(Item):
                 else:
                     alive = False
                 light.nodes.append(p1)
-                if p1 in vis: break
-                vis.add(p1)
+                if (p1, (dx, dy)) in vis: break
+                vis.add((p1, (dx, dy)))
             x, y = p1
         light.end = item
 
