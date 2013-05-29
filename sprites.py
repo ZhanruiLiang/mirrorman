@@ -175,7 +175,7 @@ class Emitter(Item):
         alive = True
         light = self.light = Light()
         light.nodes.append((x, y))
-        vis = {(x, y)}
+        vis = {((x, y), (dx, dy))}
         cnt = 0 
         item = None
         while alive and cnt < self.MAX_LENGTH:
@@ -193,8 +193,8 @@ class Emitter(Item):
                 else:
                     alive = False
                 light.nodes.append(p1)
-                if p1 in vis: break
-                vis.add(p1)
+                if (p1, (dx, dy)) in vis: break
+                vis.add((p1, (dx, dy)))
             x, y = p1
         light.end = item
 
