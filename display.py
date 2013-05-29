@@ -26,11 +26,10 @@ class Display(object):
         glEnable(GL_RESCALE_NORMAL)
         glEnable(GL_TEXTURE_2D)
 
-
         #glEnable(GL_COLOR_MATERIAL)
         #glColorMaterial(GL_FRONT,GL_AMBIENT_AND_DIFFUSE)
 
-        glClearColor(1., 1., 1., 1.)
+        glClearColor(0., 0., 0., 1.)
 
         #glShadeModel(GL_FLAT)
         glShadeModel(GL_SMOOTH)
@@ -77,6 +76,53 @@ class Display(object):
         self.eyePos = (w * .5, (-0.3) * h, h*(1.2))
         self.centerPos = (w/2., h/2., 0.)
 
+    def drawSprites(self):
+        for sp in self.sprites:
+            sp.update()
+            glPushMatrix()
+            x, y = sp.pos
+            glTranslate(x, y, 0)
+            sp.draw()
+            glPopMatrix()
+
+    def drawReflectedSpritesAndGround(self):
+        glDisable(GL_DEPTH_TEST)
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE)
+        glEnable(GL_STENCIL_TEST)
+        glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE)
+        glStencilFunc(GL_ALWAYS, 1, 0xffffffff)
+        glPushMatrix()
+        glScale(1., 1., 0.001)
+        glutSolidCube(100)
+        glPopMatrix()
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
+        glEnable(GL_DEPTH_TEST)
+        glStencilFunc(GL_EQUAL, 1, 0xffffffff)
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+
+        glPushMatrix()
+        glScalef(1.0, 1.0, -1.0)
+        glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
+        self.drawSprites()
+        glDisable(GL_NORMALIZE)
+        glPopMatrix()
+
+        glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
+        glDisable(GL_STENCIL_TEST)
+
+        glEnable(GL_BLEND)
+        glDisable(GL_LIGHTING)
+        glBlendEquation(GL_FUNC_ADD)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glColor4f(0, 0.79, 1., .4)
+        glPushMatrix()
+        glScale(1., 1., 0.001)
+        glTranslate(5,5,0)
+        glutSolidCube(14)
+        glPopMatrix()
+        glDisable(GL_BLEND)
+        glEnable(GL_LIGHTING)
+
 
     def add(self, sp):
         self.sprites.append(sp)
@@ -86,7 +132,10 @@ class Display(object):
         # self.add(Hint(((100, 100), (300, 100)), text))
 
     def update(self):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        self.sprites = [sp for sp in self.sprites if sp.alive]
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |\
+                    GL_STENCIL_BUFFER_BIT);
         glLoadIdentity()
         gluLookAt(*self.eyePos + self.centerPos + (0., 0., 1.))
 
@@ -94,24 +143,18 @@ class Display(object):
         gt = gw + gh
         glTranslate(gw/2., gh/2., 0)
         glScale(gw, gh, gt)
+        glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
 
-        for sp in self.sprites:
-            if sp.alive:
-                sp.update()
-                glPushMatrix()
-                x, y = sp.pos
-                glTranslate(x, y, 0)
-                sp.draw()
-                glPopMatrix()
+        self.drawReflectedSpritesAndGround()
+        self.drawSprites()
 
-        self.sprites = [sp for sp in self.sprites if sp.alive]
 
         #see light location
         glPushMatrix()
         glTranslate(self.lightPos[0],self.lightPos[1],self.lightPos[2])
         glutSolidCube(0.2)
         glPopMatrix()
-        glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
+
         pygame.display.flip()
 
 

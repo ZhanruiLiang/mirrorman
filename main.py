@@ -11,7 +11,7 @@ def move((x, y), (dx, dy)):
     return x + dx, y + dy
 
 display.init()
-
+pygame.display.gl_set_attribute(pygame.GL_STENCIL_SIZE, 2)
 
 class Game:
     def move_player(self, player, direction):
@@ -45,7 +45,7 @@ class Game:
 
     def init_display(self):
         display = self.display = Display(self.field.size)
-        display.add(self.field)
+        #display.add(self.field)
         for sp in self.field:
             display.add(sp)
         lights = self.lights = Lights()

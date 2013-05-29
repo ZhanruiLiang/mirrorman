@@ -67,6 +67,7 @@ class Material(object):
         self.diffuse = (1., 1., 1.)
         self.specular = (.0, .0, .0)
         self.shininess = 10.
+        self.alpha = 1.
         self.texW = 0
         self.texH = 0
         self.image = None
@@ -83,6 +84,8 @@ class Material(object):
                 self.specular = map(float, v[1:4])
             elif v[0] == 'Ns':
                 self.shininess = float(v[1])
+            elif v[0] == 'd' or v[0] == 'Tr':
+                self.alpha = float(v[1])
             elif v[0] == 'map_Kd':
                 self.texid = glGenTextures(1)
                 print self.texid
@@ -96,6 +99,10 @@ class Material(object):
                                 GL_LINEAR)
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                                 GL_LINEAR)
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                                GL_MIRRORED_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                                GL_MIRRORED_REPEAT);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                              self.texW, self.texH, 0, GL_RGBA,
                              GL_UNSIGNED_BYTE, self.image)

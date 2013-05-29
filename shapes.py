@@ -70,6 +70,7 @@ class BasicShape(Model):
     def draw(self):
         glEnable(GL_TEXTURE_2D)
         glEnableClientState(GL_TEXTURE_COORD_ARRAY)
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
 
         glMaterialfv(GL_FRONT, GL_AMBIENT, self.material.ambient)
         glMaterialfv(GL_FRONT, GL_DIFFUSE, self.material.diffuse)
