@@ -9,9 +9,9 @@ __meta__ = type
 
 cylindar = shapes.cylindarShape()
 playerShape = None
-def spritesInit():
+def sprites_init():
     global playerShape
-    playerShape = shapes.PlayerShape()
+    playerShape = shapes.BasicShape()
 
 
 def alpha(color, a):

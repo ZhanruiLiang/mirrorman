@@ -3,7 +3,7 @@ import sys
 import config
 import display
 from display import Display
-from sprites import Goal, Lights, spritesInit
+from sprites import Goal, Lights, sprites_init
 from levels import Level, levels
 import shapes
 
@@ -71,7 +71,7 @@ class Game:
         fcnt = 0
         newDir = None
 
-        spritesInit()
+        sprites_init()
         while not self._quit:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
