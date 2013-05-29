@@ -112,7 +112,7 @@ class Player(Item):
 
     def __init__(self, *args, **kwargs):
         super(Player, self).__init__(*args, **kwargs)
-        self.shape = shapes.PlayerShape()
+        self.shape = shapes.BasicShape()
 
     def update(self):
         self.t += 1
