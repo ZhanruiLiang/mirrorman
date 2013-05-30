@@ -12,5 +12,5 @@ Dirs = {
     pygame.K_DOWN: (0, -1),
 }
 
-PLAYER_MODEL = 'frog.obj'
+PLAYER_MODEL = 'robot.obj'
 # PLAYER_MODEL = 'capsule.obj'

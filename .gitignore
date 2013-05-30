@@ -1,3 +1,6 @@
 *.py[co]
 *.sw[po]
 __pycache__/
+*.xcf
+*.blend1
+*.blend2
