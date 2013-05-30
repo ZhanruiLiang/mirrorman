@@ -1,0 +1,42 @@
+# Blender MTL File: 'robot.blend'
+# Material Count: 4
+
+newmtl Material
+Ns 25.490196
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.286903 0.204884
+Ks 0.500000 0.212440 0.199704
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd monkyface.png
+
+newmtl Material.001
+Ns 70.588235
+Ka 0.000000 0.000000 0.000000
+Kd 0.703698 0.023645 0.032732
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd torso.png
+
+newmtl Material_monkyface.png
+Ns 25.490196
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.286903 0.204884
+Ks 0.500000 0.212440 0.199704
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd monkyface.png
+
+newmtl material.skin
+Ns 35.294118
+Ka 0.000000 0.000000 0.000000
+Kd 0.054783 0.462065 0.101950
+Ks 0.500000 0.470791 0.457836
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd monkyskin.png
