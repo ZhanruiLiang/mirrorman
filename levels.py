@@ -29,6 +29,24 @@ class Field(Sprite):
         for y in xrange(1, h-1):
             self.add_sprite(Obstacle(pos=(0, y)))
             self.add_sprite(Obstacle(pos=(w-1, y)))
+        self.init_texture()
+
+    def init_texture(self):
+        image = pygame.image.load(os.path.join("pictures", "71.jpg"))
+        w, h = image.get_rect().size
+        image = pygame.image.tostring(image, 'RGBA', 1)
+        self.texid = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, self.texid)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                        GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                        GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                        GL_REPEAT)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                        GL_REPEAT)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA,
+                     GL_UNSIGNED_BYTE, image)
 
     def add_sprite(self, sp):
         # unpack to check
@@ -66,11 +84,25 @@ class Field(Sprite):
                 if sp: yield sp
 
     def draw(self):
-        glScale(self.size[0], self.size[1], 0.01)
-        glDisable(GL_LIGHTING)
-        glColor3d(.6, .6, .5)
-        glutSolidCube(1)
-        glEnable(GL_LIGHTING)
+        w, h = self.size
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, self.texid)
+        glBegin(GL_QUADS)
+        glTexCoord2f(.0, .0)
+        glVertex3f(.0, .0, .0)
+        glTexCoord2f(.0, float(h)/15)
+        glVertex3f(.0, h, .0)
+        glTexCoord2f(float(w)/15, float(h)/15)
+        glVertex3f(w, h, .0)
+        glTexCoord2f(float(w)/15, .0)
+        glVertex3f(w, .0, .0)
+        glEnd()
+
+        #glScale(self.size[0], self.size[1], 0.01)
+        #glDisable(GL_LIGHTING)
+        #glColor3d(.6, .6, .5)
+        #glutSolidCube(1)
+        #glEnable(GL_LIGHTING)
 
 class Level:
     """

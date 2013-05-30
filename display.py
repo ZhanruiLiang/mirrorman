@@ -77,16 +77,13 @@ class Display(object):
             sp.draw()
             glPopMatrix()
 
-    def drawReflectedSpritesAndGround(self):
+    def drawReflectedSpritesAndField(self, field):
         glDisable(GL_DEPTH_TEST)
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE)
         glEnable(GL_STENCIL_TEST)
         glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE)
         glStencilFunc(GL_ALWAYS, 1, 0xffffffff)
-        glPushMatrix()
-        glScale(1., 1., 0.001)
-        glutSolidCube(100)
-        glPopMatrix()
+        field.draw()
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
         glEnable(GL_DEPTH_TEST)
         glStencilFunc(GL_EQUAL, 1, 0xffffffff)
@@ -106,12 +103,7 @@ class Display(object):
         glDisable(GL_LIGHTING)
         glBlendEquation(GL_FUNC_ADD)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glColor4f(0, 0.79, 1., .4)
-        glPushMatrix()
-        glScale(1., 1., 0.001)
-        glTranslate(5,5,0)
-        glutSolidCube(14)
-        glPopMatrix()
+        field.draw()
         glDisable(GL_BLEND)
         glEnable(GL_LIGHTING)
 
@@ -123,7 +115,7 @@ class Display(object):
         print text
         # self.add(Hint(((100, 100), (300, 100)), text))
 
-    def update(self):
+    def update(self, field):
         self.sprites = [sp for sp in self.sprites if sp.alive]
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |\
@@ -137,7 +129,7 @@ class Display(object):
         glScale(gw, gh, gt)
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
 
-        self.drawReflectedSpritesAndGround()
+        self.drawReflectedSpritesAndField(field)
         self.drawSprites()
 
 

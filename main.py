@@ -104,11 +104,11 @@ class Game:
                 if self.player.dying:
                     self.end_game(False)
             # update display
-            display.update()
+            display.update(self.field)
             # tick
             timer.tick(config.FPS)
             fcnt += 1
 
 
 game = Game()
-game.play(levels[-1]())
+game.play(levels[0]())
