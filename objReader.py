@@ -50,11 +50,11 @@ class Model(object):
         tm = Timer()
         self.objectList = []
         self.mtlname = "None"
+        self.listname = 0
         vertices = []
         normals = []
         texcoords = []
         obj = Object()
-
 
         for line in open(os.path.join(baseDir, filename), "r"):
             if line.startswith('#'): continue
@@ -102,11 +102,18 @@ class Model(object):
                     obj.material = mtl
                     break
 
+        self.listname = glGenLists(1)
+        glNewList(self.listname, GL_COMPILE)
+        for obj in self.objectList:
+            obj.draw()
+        glEndList()
+
         print 'object {}, load time: {}'.format(filename, tm.tick())
 
     def draw(self):
-        for obj in self.objectList:
-            obj.draw()
+        glCallList(self.listname)
+        #for obj in self.objectList:
+        #    obj.draw()
 
 imagenameToTexid = {}
 
