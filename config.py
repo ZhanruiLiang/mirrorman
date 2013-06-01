@@ -13,4 +13,4 @@ Dirs = {
 }
 
 PLAYER_MODEL = 'robot.obj'
-# PLAYER_MODEL = 'capsule.obj'
+#PLAYER_MODEL = 'capsule.obj'

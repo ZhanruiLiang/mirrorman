@@ -90,6 +90,7 @@ class Item(Sprite):
 
     def draw(self):
         glTranslate(0, 0, .5)
+        glScalef(0.8,0.8,1)
         if self.dying:
             if self.restTime % 2:
                 color = self.color
@@ -97,14 +98,8 @@ class Item(Sprite):
                 color = (.3, .2, .2, .2)
         else:
             color = self.color
-        #glColor4dv(color)
         self.setMaterial(color)
-        #glutSolidSphere(0.4,50,50)
-        glPushMatrix()
-        glScalef(.8,.8,.8)
         cylindar.draw()
-        #glutSolidTorus(.1,.4,15,15)
-        glPopMatrix()
 
 class Player(Item):
     color = glcolor(69, 161, 17, 0xff)
@@ -126,13 +121,11 @@ class Player(Item):
 
     def draw(self):
         glTranslate(0, 0, self.h)
-        glPushMatrix()
         glTranslate(.0, .0, .5)
-        glScale(.5, .5, .2)
+        glScale(0.5, 0.5, .2)
         ox, oy = self.orient
         glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
         self.shape.draw()
-        glPopMatrix()
 
 
 class Mirror(Item):
@@ -143,9 +136,10 @@ class Mirror(Item):
         angle = math.degrees(math.atan2(self.orient[1], self.orient[0]))
 
         # draw mirror base
-        self.setMaterial((.0,.0,.0,.0))
+        self.setMaterial((.2,.0,.0,.5))
         #glColor4f(0., 0., 0., 0.)
         glPushMatrix()
+        glTranslate(.0, .0, .1)
         glScale(1., 1., .2)
         glutSolidCube(1)
         glPopMatrix()
@@ -238,5 +232,6 @@ class Lights(Sprite):
             for p in light.nodes:
                 x, y = p
                 glVertex3d(x, y, .5)
+                
             glEnd()
         glEnable(GL_LIGHTING)
