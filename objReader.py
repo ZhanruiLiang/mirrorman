@@ -32,8 +32,9 @@ class Object(object):
         else: glDisable(GL_TEXTURE_2D)
 
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+        
         glMaterialfv(GL_FRONT, GL_AMBIENT, self.material.ambient)
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, self.material.ambient)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, self.material.diffuse)
         glMaterialfv(GL_FRONT, GL_SPECULAR, self.material.specular)
         glMaterialfv(GL_FRONT, GL_SHININESS, self.material.shininess)
         glVertexPointer(3, GL_FLOAT, 0, self.vertices)
@@ -43,6 +44,9 @@ class Object(object):
         glDrawElements(GL_TRIANGLES, len(self.indices),
                        GL_UNSIGNED_INT, self.indices)
 
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+
+        glDisable(GL_TEXTURE_2D)
 
 
 class Model(object):

@@ -15,7 +15,7 @@ Dirs = {
 PLAYER_MODEL = 'robot.obj'
 #PLAYER_MODEL = 'capsule.obj'
 
-FIELD_PIC_PATH = os.path.join("pictures", "71.jpg")
+FIELD_PIC_PATH = os.path.join("pictures", "window3.jpg")
 
 SHADOW_COLOR = (.1, .1, .1, 1)
 BACK_COLOR = (0., 0., 0., 1)
