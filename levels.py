@@ -1,6 +1,7 @@
 from sprites import Sprite, Emitter, Bomb, Obstacle, Player, Mirror, Goal
 from sprites import *
 from config import GRID_SIZE
+import config
 import pygame
 
 __meta__ = type
@@ -32,7 +33,7 @@ class Field(Sprite):
         self.init_texture()
 
     def init_texture(self):
-        image = pygame.image.load(os.path.join("pictures", "71.jpg"))
+        image = pygame.image.load(config.FIELD_PIC_PATH)
         w, h = image.get_rect().size
         image = pygame.image.tostring(image, 'RGBA', 1)
         self.texid = glGenTextures(1)
@@ -87,11 +88,12 @@ class Field(Sprite):
         w, h = self.size
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, self.texid)
+        glTranslate(.5, .5, 0)
         glBegin(GL_QUADS)
         glTexCoord2f(.0, .0)
-        glVertex3f(-1., 0., .0)
+        glVertex3f(-1, 0, .0)
         glTexCoord2f(.0, float(h)/15)
-        glVertex3f(-1., h, .0)
+        glVertex3f(-1, h, .0)
         glTexCoord2f(float(w)/15, float(h)/15)
         glVertex3f(w, h, .0)
         glTexCoord2f(float(w)/15, .0)

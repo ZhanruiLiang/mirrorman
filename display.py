@@ -8,7 +8,6 @@ import math
 from utils import Timer
 import utils
 
-
 def init():
     tm = Timer()
     global screen
@@ -25,11 +24,11 @@ def init():
 
     glShadeModel(GL_SMOOTH)
 
-    glClearColor(0., 0., 0., 1.)
+    glClearColor(*config.BACK_COLOR)
 
     glLight(GL_LIGHT0, GL_AMBIENT, (.2, .2, .2, 1.))
     glLight(GL_LIGHT0, GL_DIFFUSE, (.8, .8, .8, 1.))
-    glLight(GL_LIGHT0, GL_SPECULAR, (.2, .2, .2, 1.))
+    glLight(GL_LIGHT0, GL_SPECULAR, (.3, .3, .3, 1.))
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (.2, .2, .2, 1.))
     
     glEnable(GL_LIGHTING)
@@ -53,10 +52,11 @@ class Display(object):
         self.size = config.SCREEN_SIZE
 
         w, h = self.size
-        self.lightPos = (-50.,-50., 120,  1.)
+        self.lightPos = (-50.,-50., 150,  1.)
 
         self.sprites = []
         self.reshape()
+        self.initShadowMatrix()
 
     def reshape(self):
         w, h = self.size
@@ -113,7 +113,7 @@ class Display(object):
         glDisable(GL_BLEND)
         glEnable(GL_LIGHTING)
 
-    def mulShadowMatrix(self):
+    def initShadowMatrix(self):
         l = list(self.lightPos)
         factor = math.sqrt(l[0]**2 + l[1]**2 + l[2]**2)
         l[0] /= factor
@@ -126,7 +126,8 @@ class Display(object):
                      -l[0]*n[1],dot-l[1]*n[1],-l[2]*n[1],-l[3]*n[1],
                      -l[0]*n[2],-l[1]*n[2],dot-l[2]*n[2],-l[3]*n[2],
                      -l[0]*n[3],-l[1]*n[3],-l[2]*n[3],dot-l[3]*n[3]]
-        glMultMatrixf(shadowMat)
+        self.shadowMat = utils.convert_ctypes(
+            shadowMat, ctypes.c_float, (len(shadowMat), ))
 
     def drawShadow(self):
         #draw shadow stencil
@@ -139,12 +140,12 @@ class Display(object):
         glStencilFunc(GL_ALWAYS, 1, 0xffffffff)
 
         glPushMatrix()
+        glMultMatrixf(self.shadowMat)
         for sp in self.sprites:
             if not (type(sp) is Lights):
                 glPushMatrix()
                 x, y = sp.pos
                 glTranslate(x, y, 0)
-                self.mulShadowMatrix()
                 sp.draw()
                 glPopMatrix()
         glPopMatrix()
@@ -156,7 +157,7 @@ class Display(object):
         glStencilFunc(GL_EQUAL, 1, 0xffffffff)
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
 
-        glColor4f(.0, .0, .0, .8)
+        glColor4f(*config.SHADOW_COLOR)
         glPushMatrix()
         glScale(1., 1., 0.0001)
         glutSolidCube(1000)

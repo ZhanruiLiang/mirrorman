@@ -7,6 +7,8 @@ from sprites import Goal, Lights
 from levels import Level, levels
 import shapes
 
+clock = pygame.time.Clock()
+
 def move((x, y), (dx, dy)):
     return x + dx, y + dy
 
@@ -108,6 +110,8 @@ class Game:
             display.update(self.field)
             # tick
             timer.tick(config.FPS)
+            clock.tick()
+            print clock.get_fps()
             fcnt += 1
 
 
