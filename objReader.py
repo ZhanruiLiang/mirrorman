@@ -1,6 +1,5 @@
 import utils
 import pygame
-from copy import deepcopy
 import os, sys
 from OpenGL.GL import *
 from utils import Timer
@@ -16,7 +15,7 @@ class Object(object):
         self.mtlname = "None"
         self.material = None
 
-    def process(self):
+    def convert(self):
         self.indices = range(len(self.vertices))
         self.indices = utils.convert_ctypes(
             self.indices, ctypes.c_uint, (len(self.indices), ))
@@ -69,7 +68,7 @@ class Model(object):
                 if obj.mtlname == "None":
                     obj.mtlname = v[1]
                 else:
-                    self.objectList.append(deepcopy(obj))
+                    self.objectList.append(obj)
                     obj = Object()
                     obj.mtlname = v[1]
             elif v[0] == 'v':
@@ -95,16 +94,14 @@ class Model(object):
                     obj.texcoords.append(texcoords[temp[1]-1])
                     obj.normals.append(normals[temp[2]-1])
 
-        self.objectList.append(deepcopy(obj))
+        self.objectList.append(obj)
         for o in self.objectList:
-            o.process()
+            o.convert()
 
-        mtlReader = MaterialReader(self.mtlname)
-        for obj in self.objectList:
-            for mtl in mtlReader.materialList:
+        for mtl in read_material(self.mtlname):
+            for obj in self.objectList:
                 if mtl.mtlname == obj.mtlname:
                     obj.material = mtl
-                    break
 
         self.listname = glGenLists(1)
         glNewList(self.listname, GL_COMPILE)
@@ -116,7 +113,7 @@ class Model(object):
 
     def draw(self):
         glCallList(self.listname)
-        #for obj in self.objectList:
+        # for obj in self.objectList:
         #    obj.draw()
 
 imagenameToTexid = {}
@@ -131,54 +128,61 @@ class Material(object):
         self.texid = 0
         self.mtlname = "None"
 
-class MaterialReader(object):
-    def __init__ (self, filename):
-        tm = Timer()
-        self.materialList = []
-        mtl = Material()
+    def convert(self):
+        self.ambient = utils.convert_ctypes(self.ambient, ctypes.c_float, (3,))
+        self.diffuse = utils.convert_ctypes(self.diffuse, ctypes.c_float, (3,))
+        self.specular = utils.convert_ctypes(self.specular, ctypes.c_float, (3,))
 
-        for line in open(os.path.join(baseDir, filename), "r"):
-            if line.startswith('#'): continue
-            v = line.split()
-            if not v: continue
-            if v[0] == 'newmtl':
-                if mtl.mtlname == 'None':
-                    mtl.mtlname = v[1]
-                else:
-                    self.materialList.append(deepcopy(mtl))
-                    mtl = Material()
-                    mtl.mtlname = v[1]
-            elif v[0] == 'Ka':
-                mtl.ambient = map(float, v[1:4])
-            elif v[0] == 'Kd':
-                mtl.diffuse = map(float, v[1:4])
-            elif v[0] == 'Ks':
-                mtl.specular = map(float, v[1:4])
-            elif v[0] == 'Ns':
-                mtl.shininess = float(v[1])
-            elif v[0] == 'd' or v[0] == 'Tr':
-                self.alpha = float(v[1])
-            elif v[0] == 'map_Kd':
-                mtl.texid = glGenTextures(1)
-                if imagenameToTexid.get(v[1]): continue
-                imagenameToTexid[v[1]] = mtl.texid
-                image = pygame.image.load(os.path.join(baseDir, v[1]))
-                w, h = image.get_rect().size
-                image = pygame.image.tostring(image, 'RGBA', 1)
-                glBindTexture(GL_TEXTURE_2D, mtl.texid)
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                                GL_LINEAR)
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                GL_LINEAR)
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                                GL_MIRRORED_REPEAT)
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                                GL_MIRRORED_REPEAT)
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h,
-                             0, GL_RGBA, GL_UNSIGNED_BYTE, image)
+def read_material(filename):
+    tm = Timer()
+    materialList = []
+    mtl = Material()
 
-        self.materialList.append(deepcopy(mtl))
-        print 'material {}, load time: {}'.format(filename, tm.tick())
+    for line in open(os.path.join(baseDir, filename), "r"):
+        if line.startswith('#'): continue
+        v = line.split()
+        if not v: continue
+        if v[0] == 'newmtl':
+            if mtl.mtlname == 'None':
+                mtl.mtlname = v[1]
+            else:
+                materialList.append(mtl)
+                mtl = Material()
+                mtl.mtlname = v[1]
+        elif v[0] == 'Ka':
+            mtl.ambient = map(float, v[1:4])
+        elif v[0] == 'Kd':
+            mtl.diffuse = map(float, v[1:4])
+        elif v[0] == 'Ks':
+            mtl.specular = map(float, v[1:4])
+        elif v[0] == 'Ns':
+            mtl.shininess = float(v[1])
+        elif v[0] == 'd' or v[0] == 'Tr':
+            mtl.alpha = float(v[1])
+        elif v[0] == 'map_Kd':
+            mtl.texid = glGenTextures(1)
+            if v[1] in imagenameToTexid: continue
+            imagenameToTexid[v[1]] = mtl.texid
+            image = pygame.image.load(os.path.join(baseDir, v[1]))
+            w, h = image.get_rect().size
+            image = pygame.image.tostring(image, 'RGBA', 1)
+            glBindTexture(GL_TEXTURE_2D, mtl.texid)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                            GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                            GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                            GL_MIRRORED_REPEAT)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                            GL_MIRRORED_REPEAT)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h,
+                         0, GL_RGBA, GL_UNSIGNED_BYTE, image)
+
+    materialList.append(mtl)
+    for material in materialList:
+        material.convert()
+    print 'material {}, load time: {}'.format(filename, tm.tick())
+    return materialList
 
 if __name__ == '__main__':
     o = Model('robot.obj')
