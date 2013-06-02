@@ -190,7 +190,7 @@ class Display(object):
         glScale(gw, gh, gt)
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
         
-        self.drawShadow()
+        # self.drawShadow()
         self.drawSprites()
         self.drawReflectedSpritesAndField(field)
 

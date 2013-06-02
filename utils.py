@@ -21,6 +21,19 @@ def convert_ctypes(a, type, shape):
     assign(a, b, shape)
     return b
 
+def eye_glmat4():
+    a = (ctypes.c_float * 16)()
+    a[0] = a[4] = a[8] = a[12] = 1
+    return a
+
+def mult_mat4_vec4(m4, v4):
+    c = (ctypes.c_float * 4)()
+    for i in xrange(4):
+        c[i] = 0
+        for k in xrange(4):
+            c[i] += m4[4 * k + i] * v4[k]
+    return c
+
 Timer = Clock
 
 if __name__ == '__main__':
