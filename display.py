@@ -1,7 +1,7 @@
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from OpenGL.GL import *
-from sprites import Lights, cylindar
+from sprites import Lights, cylindar, Item
 import config
 import pygame
 import math
@@ -73,9 +73,14 @@ class Display(object):
     def drawSprites(self):
         for sp in self.sprites:
             glPushMatrix()
+
             x, y = sp.pos
             glTranslate(x, y, 0)
+            if isinstance(sp, Item):
+                ox, oy = sp.orient
+                glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
             sp.draw()
+
             glPopMatrix()
 
     def drawReflectedSpritesAndField(self, field):

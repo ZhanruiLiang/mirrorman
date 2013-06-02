@@ -3,6 +3,8 @@ import math
 from config import GRID_SIZE, FPS
 from OpenGL.GL import *
 from OpenGL.GLUT import *
+from objReader import Model
+from animation import Animation
 import shapes
 
 __meta__ = type
@@ -101,32 +103,37 @@ class Item(Sprite):
         self.setMaterial(color)
         cylindar.draw()
 
-class Player(Item):
-    color = glcolor(69, 161, 17, 0xff)
-    t = 0
+class AnimatedItem(Item):
+    def __init__(self, modelName, pos=(0, 0), orient=(1, 0)):
+        super(AnimatedItem, self).__init__(pos, orient)
+        self.animations = {}
+        self.animation = None
+        self.model = Model(modelName+'.obj')
 
-    def __init__(self, *args, **kwargs):
-        super(Player, self).__init__(*args, **kwargs)
-        self.shape = shapes.BasicShape()
+    def load_animation(self, aniName):
+        ani = Animation(aniName+'.ani', self.model)
+        self.animations[aniName] = ani
+        if not self.animation:
+            self.animation = ani
 
     def update(self):
-        self.t += 1
-        self.t %= FPS * 10
-        self.h = 0.1 * math.sin(math.pi * 2 * self.t / FPS)
+        super(AnimatedItem, self).update()
+        self.animation.step()
+
+    def draw(self):
+        self.model.draw()
+
+class Player(AnimatedItem):
+    color = glcolor(69, 161, 17, 0xff)
+
+    def __init__(self, pos=(0, 0), orient=(1, 0)):
+        super(Player, self).__init__('robot', pos, orient)
+        self.load_animation('walk')
 
     def move(self, direction):
         dx, dy = direction
         self.orient = (dx, dy)
         super(Player, self).move(direction)
-
-    def draw(self):
-        glTranslate(0, 0, self.h)
-        glTranslate(.0, .0, .5)
-        glScale(0.5, 0.5, .2)
-        ox, oy = self.orient
-        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
-        self.shape.draw()
-
 
 class Mirror(Item):
     color = glcolor(168, 255, 235, 0xff)

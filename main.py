@@ -111,9 +111,9 @@ class Game:
             # tick
             timer.tick(config.FPS)
             clock.tick()
-            print clock.get_fps()
+            if fcnt % 30 == 0:
+                print clock.get_fps()
             fcnt += 1
-
 
 game = Game()
 game.play(levels[1]())

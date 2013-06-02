@@ -1,4 +1,5 @@
 import os, sys
+import ctypes
 import utils
 
 baseDir = "animations"
@@ -8,12 +9,13 @@ class Animation(object):
     Animation file format:
     'ts' timeStep # time between frames, in second
     'n' totalFrames 
-    'i' objName invMatrix
     'f' objName frameID matrix... # frames counts from 0
     """
     def __init__(self, filename, model):
+        self.model = model
         fullpath = os.path.join(baseDir, filename)
         invMats = {}
+        self.data = {}
         lineID = 0
         for line in open(fullpath, 'r'):
             line = line.split()
@@ -22,17 +24,28 @@ class Animation(object):
             if opr == 'f':
                 objName = line[1]
                 frameID = int(line[2])
-                mat = utils.convert(line[3:], c_float, (16,))
+                mat = utils.convert_ctypes(map(float, line[3:]), 
+                        ctypes.c_float, (16,))
+                self.data[objName, frameID] = mat
             elif opr == 'ts':
                 self.timeStep = float(line[1])
             elif opr == 'n':
                 self.nFrames = int(line[1])
-            elif opr == 'i':
-                objName = line[1]
-                mat = utils.convert(line[2:], c_float, (16,))
-                invMats[objName] = mat
             else:
                 print 'In line {}, unknown command "{}"'.format(lineID, opr)
 
         for objName, invMat in invMats.iteritems():
             obj = model
+
+        self.start()
+
+    def step(self):
+        fi = self.frame
+        print 'fi', fi
+        data = self.data
+        # for name, obj in self.model.objects.iteritems():
+        #     obj.aniMat = data[name, fi]
+        self.frame = (self.frame + 1) % self.nFrames
+
+    def start(self):
+        self.frame = 0
