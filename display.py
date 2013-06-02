@@ -136,6 +136,7 @@ class Display(object):
         glDisable(GL_LIGHTING)
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE)
         glEnable(GL_STENCIL_TEST)
+        # print 'glIsEnabled(GL_STENCIL_TEST)', glIsEnabled(GL_STENCIL_TEST)
         glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE)
         glStencilFunc(GL_ALWAYS, 1, 0xffffffff)
 
@@ -178,8 +179,8 @@ class Display(object):
         for sp in self.sprites:
             sp.update()
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |\
-                    GL_STENCIL_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+                    GL_STENCIL_BUFFER_BIT)
         glLoadIdentity()
         gluLookAt(*self.eyePos + self.centerPos + (0., 0., 1.))
 
