@@ -1,8 +1,11 @@
 import os, sys
+import re
 import ctypes
 import utils
+from objReader import Model
+import objReader
 
-baseDir = "animations"
+baseDir = "models"
 
 class Animation(object):
     """
@@ -11,10 +14,9 @@ class Animation(object):
     'n' totalFrames 
     'f' objName frameID matrix... # frames counts from 0
     """
-    def __init__(self, filename, model):
-        self.model = model
+    def __init__(self, filename, sprite):
+        self.sprite = sprite
         fullpath = os.path.join(baseDir, filename)
-        invMats = {}
         self.data = {}
         lineID = 0
         for line in open(fullpath, 'r'):
@@ -34,17 +36,51 @@ class Animation(object):
             else:
                 print 'In line {}, unknown command "{}"'.format(lineID, opr)
 
-        for objName, invMat in invMats.iteritems():
-            obj = model
-
         self.start()
 
     def step(self):
         fi = self.frame
         data = self.data
-        for name, obj in self.model.objects.iteritems():
+        for name, obj in self.sprite.model.objects.iteritems():
             obj.aniMat = data[name, fi]
         self.frame = (self.frame + 1) % self.nFrames
 
+    def draw(self):
+        self.sprite.model.draw()
+
     def start(self):
         self.frame = 0
+
+class Animation2(Animation):
+    def __init__(self, aniFolder, sprite):
+        self.sprite = sprite
+        filenames = os.listdir(os.path.join(objReader.baseDir, aniFolder))
+        xs = [(self.extract_num(x),x) for x in filenames if self.extract_num(x) is not None]
+        xs.sort()
+        self.nFrames = len(xs)
+        self.frameModels = []
+        # i0 = xs[0][0]
+        for i, x in xs:
+            model = Model.load(os.path.join(aniFolder, x))
+            self.frameModels.append(model)
+
+        self.start()
+
+    def start(self):
+        self.frame = 0
+
+    def step(self):
+        self.sprite.model = self.model = self.frameModels[self.frame]
+        self.frame = (self.frame + 1) % self.nFrames
+
+    def draw(self):
+        self.model.draw()
+
+    ExtractPattern = re.compile(r'\w+_(?P<num>\d+)\.obj')
+    @staticmethod
+    def extract_num(filename):
+        mch = Animation2.ExtractPattern.match(filename)
+        if mch:
+            return int(mch.group('num'))
+        else:
+            return None

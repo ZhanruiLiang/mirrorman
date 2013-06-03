@@ -1,0 +1,12 @@
+# Blender MTL File: 'mirrorman.blend'
+# Material Count: 1
+
+newmtl Material.001
+Ns 17.647059
+Ka 0.000000 0.000000 0.000000
+Kd 0.300428 0.160289 0.071745
+Ks 0.034374 0.018340 0.008209
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /home/ray/python/mirrorman/models/mirrormanskin.png

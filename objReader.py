@@ -19,7 +19,7 @@ class Object(object):
     def convert(self):
         self.indices = utils.convert_ctypes(
                 self.indices, ctypes.c_uint, (len(self.indices), ))
-        print 'Object indices len:{}'.format(len(self.indices))
+        # print 'Object indices len:{}'.format(len(self.indices))
         self.vdata = utils.convert_ctypes(
                 self.vdata, ctypes.c_float, (len(self.vdata), ))
 
@@ -53,7 +53,7 @@ class Object(object):
 models = {}
 class Model(object):
     @staticmethod
-    def get(filename):
+    def load(filename):
         if filename in models:
             return models[filename]
         x = Model(filename)
@@ -68,20 +68,24 @@ class Model(object):
         self.texcoords = [[0, 0]]
         self.normals = []
 
+        fullpath = os.path.join(baseDir, filename)
+        mtlBaseDir, _ = os.path.split(fullpath)
         lineID = 0
-        for line in open(os.path.join(baseDir, filename), "r"):
+        obj = Object('default')
+        for line in open(fullpath, "r"):
             lineID += 1
             # print lineID
             if line.startswith('#'): continue
             v = line.split()
             if not v: continue
 
-            if v[0] == 'o':
+            if v[0] == 'o' or v[0] == 'g':
                 name = v[1].split('_')[0]
                 obj = Object(name)
                 self.objects[obj.name] = obj
             elif v[0] == 'usemtl':
-                obj.material = self.mtllib.get(v[1])
+                materialName = v[1]
+                obj.material = self.mtllib.get(materialName)
             elif v[0] == 'v':
                 assert len(v) == 4
                 v = map(float, v[1:4])
@@ -95,7 +99,8 @@ class Model(object):
                 v = map(float, v[1:3])
                 self.texcoords.append(v)
             elif v[0] == 'mtllib':
-                self.mtllib = MaterialLib(v[1])
+                print mtlBaseDir, v[1]
+                self.mtllib = MaterialLib.load(os.path.join(mtlBaseDir, v[1]))
             elif v[0] == 'f':
                 assert len(v) == 4
                 self.add_face(obj, v[1:])
@@ -116,11 +121,12 @@ class Model(object):
         # each index tuple: (v, t, n)
         for x in indices:
             x = x.split('/')
-            if x[1] == '':
-                vi, ni = map(int, [x[0], x[2]])
-                ti = 0
-            else:
-                vi, ti, ni = map(int, x)
+            # if x[1] == '':
+            #     vi, ni = map(int, [x[0], x[2]])
+            #     ti = 0
+            # else:
+            #     vi, ti, ni = map(int, x)
+            vi, ti, ni = map(int, x)
             obj.indices.append(len(obj.indices))
             obj.vdata.extend(
                 self.texcoords[ti] + self.normals[ni-1] + self.vertices[vi-1])
@@ -147,12 +153,16 @@ class Material(object):
         self.diffuse = utils.convert_ctypes(self.diffuse, ctypes.c_float, (3,))
         self.specular = utils.convert_ctypes(self.specular, ctypes.c_float, (3,))
 
+materialLibs = {}
+
 class MaterialLib(object):
-    def __init__(self, filename):
+
+    def __init__(self, filepath):
         tm = Timer()
         materials = self.materials = {}
+        baseDir = os.path.split(filepath)[0]
 
-        for line in open(os.path.join(baseDir, filename), "r"):
+        for line in open(filepath, "r"):
             if line.startswith('#'): continue
             v = line.split()
             if not v: continue
@@ -194,7 +204,15 @@ class MaterialLib(object):
 
         for material in materials.itervalues():
             material.convert()
-        print 'mtllib {}, load time: {}'.format(filename, tm.tick())
+        # print 'mtllib {}, load time: {}'.format(filepath, tm.tick())
+
+    @staticmethod
+    def load(filepath):
+        if filepath in materialLibs:
+            return materialLibs[filepath]
+        x = MaterialLib(filepath)
+        materialLibs[filepath] = x 
+        return x
 
     def get(self, name, default=None):
         return self.materials.get(name, default)

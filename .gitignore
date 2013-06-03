@@ -4,3 +4,5 @@ __pycache__/
 *.xcf
 *.blend1
 *.blend2
+models/sintel
+models/console_ani

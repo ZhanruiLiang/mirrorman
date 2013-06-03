@@ -19,9 +19,11 @@ class Game:
     def move_player(self, player, direction):
         x0, y0 = player.pos
         x, y = move(player.pos, direction)
-        item1 = self.field.get_sprite_at((x, y))
         canGo = True
+        push = False
+        item1 = self.field.get_sprite_at((x, y))
         if item1:
+            push = True
             if isinstance(item1, Goal):
                 self.end_game(True)
             if not item1.moveable:
@@ -34,9 +36,9 @@ class Game:
                     item1.move(direction)
                     self.field.update_sprite(item1, (x, y))
         if canGo:
-            player.move(direction)
-            self.field.update_sprite(player, (x0, y0))
-            self._dirty = True
+            player.move(direction, push)
+        else:
+            player.push(direction)
 
     def load_level(self, level):
         self.display = Display()
@@ -69,7 +71,6 @@ class Game:
         self._quit = False
         self._win = False
         self._ended = False
-        self._dirty = True
         timer = pygame.time.Clock()
         fcnt = 0
         newDir = None
@@ -87,12 +88,16 @@ class Game:
             # update logic
             if not self._ended and fcnt % config.DD == 0:
                 # update player pos
-                if newDir:
-                    self.move_player(self.player, newDir)
-                    newDir = None
+                pressed = pygame.key.get_pressed()
+                if self.player.is_ready():
+                    for key in config.Dirs:
+                        if pressed[key]:
+                            direction = config.Dirs[key]
+                            self.move_player(self.player, direction)
+                            break
+                    else:
+                        self.player.rest()
                 # recalculate lights
-                onHeats = []
-
                 for emitter in self.emitters:
                     emitter.calculate(self.field)
                     end = emitter.light.end
@@ -111,8 +116,7 @@ class Game:
             # tick
             timer.tick(config.FPS)
             clock.tick()
-            if fcnt % 30 == 0:
-                print clock.get_fps()
+            if fcnt % 30 == 0: print clock.get_fps()
             fcnt += 1
 
 game = Game()

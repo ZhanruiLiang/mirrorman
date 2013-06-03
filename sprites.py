@@ -1,10 +1,11 @@
 import pygame
 import math
-from config import GRID_SIZE, FPS
+from config import GRID_SIZE, FPS, DD
+import config
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from objReader import Model
-from animation import Animation
+from animation import Animation, Animation2
 import shapes
 
 __meta__ = type
@@ -63,7 +64,7 @@ class Item(Sprite):
         self.orient = orient
         self.restTime = None
         if self.modelName:
-            self.model = Model.get(self.modelName+'.obj')
+            self.model = Model.load(self.modelName)
         else:
             self.model = None
 
@@ -117,8 +118,11 @@ class AnimatedItem(Item):
         self.animations = {}
         self.animation = None
 
-    def load_animation(self, aniName):
-        ani = Animation(aniName+'.ani', self.model)
+    def load_animation(self, aniName, aniPath, type=1):
+        if type == 1:
+            ani = Animation(aniPath, self)
+        elif type == 2:
+            ani = Animation2(aniPath, self)
         self.animations[aniName] = ani
         # if not self.animation: self.animation = ani
 
@@ -131,28 +135,7 @@ class AnimatedItem(Item):
         self.animation = self.animations[aniName]
 
     def draw(self):
-        self.model.draw()
-
-class Player(AnimatedItem):
-    color = glcolor(69, 161, 17, 0xff)
-    modelName = 'robot'
-
-    def __init__(self, pos=(0, 0), orient=(1, 0)):
-        super(Player, self).__init__(pos, orient)
-        self.load_animation('walk')
-        self.switch('walk')
-
-    def move(self, direction):
-        dx, dy = direction
-        self.orient = (dx, dy)
-        super(Player, self).move(direction)
-
-
-    def draw(self):
-        ox, oy = self.orient
-        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
-        glTranslate(0, 0, 1.2) # dummy
-        self.model.draw()
+        self.animation.draw()
 
 class Mirror(Item):
     color = glcolor(168, 255, 235, 0xff)
@@ -235,7 +218,7 @@ class Bomb(Item):
 class Obstacle(Item):
     moveable = False
     color = glcolor(74, 80, 72, 0xff)
-    modelName = 'tower'
+    modelName = 'tower.obj'
 
     def die(self):
         pass
@@ -262,3 +245,69 @@ class Lights(Sprite):
                 
             glEnd()
         glEnable(GL_LIGHTING)
+
+class Player(AnimatedItem):
+    color = glcolor(69, 161, 17, 0xff)
+    # modelName = 'robot.obj'
+    modelName = 'mirrorman/mirrorman.obj'
+
+    ST_REST, ST_WALKING, ST_PUSHING = 0, 1, 2
+
+    def __init__(self, pos=(0, 0), orient=(1, 0)):
+        super(Player, self).__init__(pos, orient)
+        # self.load_animation('walk', 'walk.ani')
+        # self.switch('walk')
+        self.load_animation('rest', 'mirrorman/rest', type=2)
+        if config.SINGLE_ANIMATION:
+            self.animations['push'] = self.animations['rest']
+            self.animations['walk'] = self.animations['rest']
+        else:
+            self.load_animation('push', 'mirrorman/push', type=2)
+            self.load_animation('walk', 'mirrorman/walk', type=2)
+        self.state = None
+        self._pt = 0
+        self.rest()
+
+    def push(self, direction):
+        self.orient = direction
+        if self.state != self.ST_PUSHING:
+            self.state = self.ST_PUSHING
+            self.switch('push')
+
+    def rest(self):
+        if self.state != self.ST_REST:
+            self.state = self.ST_REST
+            self.switch('rest')
+
+    def move(self, direction, push=False):
+        if not push:
+            if self.state != self.ST_WALKING:
+                self.state = self.ST_WALKING
+                self.switch('walk')
+        else:
+            self.push(direction)
+        x, y = self.pos
+        dx, dy = self.orient = direction
+        self._nextPos = x + dx, y + dy
+        self._pt = 0
+
+    def draw(self):
+        ox, oy = self.orient
+        t = self._pt
+        # glutWireCube(1)
+        glTranslated(ox * t, oy * t, 0)
+        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
+        super(Player, self).draw()
+
+    def update2(self):
+        if self.state != self.ST_REST and self.pos != self._nextPos and self._pt < 1:
+            self._pt += 0.1
+            if self._pt >= 1-1e-8:
+                oldPos  = self.pos
+                self.pos = self._nextPos
+                self.field.update_sprite(self, oldPos)
+                self._pt = 0
+
+    def is_ready(self):
+        return self._pt == 0
+
