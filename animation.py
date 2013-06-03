@@ -41,10 +41,9 @@ class Animation(object):
 
     def step(self):
         fi = self.frame
-        print 'fi', fi
         data = self.data
-        # for name, obj in self.model.objects.iteritems():
-        #     obj.aniMat = data[name, fi]
+        for name, obj in self.model.objects.iteritems():
+            obj.aniMat = data[name, fi]
         self.frame = (self.frame + 1) % self.nFrames
 
     def start(self):

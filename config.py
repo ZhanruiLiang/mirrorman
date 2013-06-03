@@ -2,7 +2,7 @@ import pygame, os
 
 GRID_SIZE = 80, 80
 SCREEN_SIZE = 1000, 700
-FPS = 30
+FPS = 60
 DD = 3
 
 Dirs = {

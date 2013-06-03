@@ -76,9 +76,6 @@ class Display(object):
 
             x, y = sp.pos
             glTranslate(x, y, 0)
-            if isinstance(sp, Item):
-                ox, oy = sp.orient
-                glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
             sp.draw()
 
             glPopMatrix()
@@ -190,7 +187,7 @@ class Display(object):
         gluLookAt(*self.eyePos + self.centerPos + (0., 0., 1.))
 
         gw, gh = config.GRID_SIZE
-        gt = gw + gh
+        gt = (gw + gh)/2
         glTranslate(gw/2., gh/2., 0)
         glScale(gw, gh, gt)
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)

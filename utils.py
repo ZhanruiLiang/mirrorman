@@ -23,7 +23,7 @@ def convert_ctypes(a, type, shape):
 
 def eye_glmat4():
     a = (ctypes.c_float * 16)()
-    a[0] = a[4] = a[8] = a[12] = 1
+    for i in xrange(4): a[5 * i] = 1.
     return a
 
 def mult_mat4_vec4(m4, v4):

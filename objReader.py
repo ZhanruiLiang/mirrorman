@@ -2,6 +2,7 @@ import utils
 import pygame
 import os, sys
 from OpenGL.GL import *
+from OpenGL.GLUT import *
 from utils import Timer
 import utils
 
@@ -36,22 +37,35 @@ class Object(object):
 
         if material:
             glBindTexture(GL_TEXTURE_2D, material.texid)
+        glPushMatrix()
         glInterleavedArrays(GL_T2F_N3F_V3F, 0, self.vdata)
-        # glMultMatrixf(self.aniMat)
+        glMultMatrixf(self.aniMat)
+        # print self.name
+        # print glGetFloatv(GL_MODELVIEW_MATRIX)
         glDrawElements(GL_TRIANGLES, len(self.indices),
                        GL_UNSIGNED_INT, self.indices)
+        glPopMatrix()
 
         # is these line needed ?
         # glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
         # glDisable(GL_TEXTURE_2D)
 
+models = {}
 class Model(object):
+    @staticmethod
+    def get(filename):
+        if filename in models:
+            return models[filename]
+        x = Model(filename)
+        models[filename] = x 
+        return x
+
     def __init__(self, filename):
         tm = Timer()
         self.objects = {}
         self.mtllib = None
         self.vertices = []
-        self.texcoords = []
+        self.texcoords = [[0, 0]]
         self.normals = []
 
         lineID = 0
@@ -63,7 +77,8 @@ class Model(object):
             if not v: continue
 
             if v[0] == 'o':
-                obj = Object(v[1])
+                name = v[1].split('_')[0]
+                obj = Object(name)
                 self.objects[obj.name] = obj
             elif v[0] == 'usemtl':
                 obj.material = self.mtllib.get(v[1])
@@ -83,27 +98,32 @@ class Model(object):
                 self.mtllib = MaterialLib(v[1])
             elif v[0] == 'f':
                 assert len(v) == 4
-                indices = map(lambda x:map(int, x.split('/')), v[1:])
-                self.add_face(obj, indices)
+                self.add_face(obj, v[1:])
 
         for obj in self.objects.itervalues():
             obj.convert()
 
-        self.listname = glGenLists(1)
-        glNewList(self.listname, GL_COMPILE)
-        for obj in self.objects.itervalues():
-            obj.draw()
-        glEndList()
+        # self.listname = glGenLists(1)
+        # glNewList(self.listname, GL_COMPILE)
+        # for obj in self.objects.itervalues():
+        #     obj.draw()
+        # glEndList()
 
         print 'object {}, load time: {}'.format(filename, tm.tick())
 
     def add_face(self, obj, indices):
         assert len(indices) == 3, 'please use triangle faces'
         # each index tuple: (v, t, n)
-        for vi, ti, ni in indices:
+        for x in indices:
+            x = x.split('/')
+            if x[1] == '':
+                vi, ni = map(int, [x[0], x[2]])
+                ti = 0
+            else:
+                vi, ti, ni = map(int, x)
             obj.indices.append(len(obj.indices))
             obj.vdata.extend(
-                self.texcoords[ti-1] + self.normals[ni-1] + self.vertices[vi-1])
+                self.texcoords[ti] + self.normals[ni-1] + self.vertices[vi-1])
 
     def draw(self):
         # glCallList(self.listname)
@@ -151,10 +171,13 @@ class MaterialLib(object):
             elif v[0] == 'd' or v[0] == 'Tr':
                 mtl.alpha = float(v[1])
             elif v[0] == 'map_Kd':
+                imgName = v[1]
+                if imgName in imagenameToTexid: 
+                    mtl.texid = imagenameToTexid[imgName]
+                    continue
                 mtl.texid = glGenTextures(1)
-                if v[1] in imagenameToTexid: continue
-                imagenameToTexid[v[1]] = mtl.texid
-                image = pygame.image.load(os.path.join(baseDir, v[1]))
+                imagenameToTexid[imgName] = mtl.texid
+                image = pygame.image.load(os.path.join(baseDir, imgName))
                 w, h = image.get_rect().size
                 image = pygame.image.tostring(image, 'RGBA', 1)
                 glBindTexture(GL_TEXTURE_2D, mtl.texid)

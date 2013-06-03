@@ -56,11 +56,16 @@ class Item(Sprite):
     moveable = True
     dieTime = 10
     field = None
+    modelName = None
 
     def __init__(self, pos=(0, 0), orient=(1, 0)):
         super(Item, self).__init__(pos)
         self.orient = orient
         self.restTime = None
+        if self.modelName:
+            self.model = Model.get(self.modelName+'.obj')
+        else:
+            self.model = None
 
     def move(self, direction):
         x, y = self.pos
@@ -91,49 +96,63 @@ class Item(Sprite):
         glMaterialf(GL_FRONT, GL_SHININESS, .5)
 
     def draw(self):
-        glTranslate(0, 0, .5)
-        glScalef(0.8,0.8,1)
-        if self.dying:
-            if self.restTime % 2:
-                color = self.color
-            else:
-                color = (.3, .2, .2, .2)
+        if self.model:
+            self.model.draw()
         else:
-            color = self.color
-        self.setMaterial(color)
-        cylindar.draw()
+            glTranslate(0, 0, .5)
+            glScalef(0.8,0.8,1)
+            if self.dying:
+                if self.restTime % 2:
+                    color = self.color
+                else:
+                    color = (.3, .2, .2, .2)
+            else:
+                color = self.color
+            self.setMaterial(color)
+            cylindar.draw()
 
 class AnimatedItem(Item):
-    def __init__(self, modelName, pos=(0, 0), orient=(1, 0)):
+    def __init__(self, pos=(0, 0), orient=(1, 0)):
         super(AnimatedItem, self).__init__(pos, orient)
         self.animations = {}
         self.animation = None
-        self.model = Model(modelName+'.obj')
 
     def load_animation(self, aniName):
         ani = Animation(aniName+'.ani', self.model)
         self.animations[aniName] = ani
-        if not self.animation:
-            self.animation = ani
+        # if not self.animation: self.animation = ani
 
     def update(self):
         super(AnimatedItem, self).update()
-        self.animation.step()
+        if self.animation:
+            self.animation.step()
+
+    def switch(self, aniName):
+        self.animation = self.animations[aniName]
 
     def draw(self):
         self.model.draw()
 
 class Player(AnimatedItem):
     color = glcolor(69, 161, 17, 0xff)
+    modelName = 'robot'
 
     def __init__(self, pos=(0, 0), orient=(1, 0)):
-        super(Player, self).__init__('robot', pos, orient)
+        super(Player, self).__init__(pos, orient)
         self.load_animation('walk')
+        self.switch('walk')
 
     def move(self, direction):
         dx, dy = direction
         self.orient = (dx, dy)
         super(Player, self).move(direction)
+
+
+    def draw(self):
+        ox, oy = self.orient
+        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
+        glTranslate(0, 0, 1.2) # dummy
+        self.model.draw()
 
 class Mirror(Item):
     color = glcolor(168, 255, 235, 0xff)
@@ -216,6 +235,7 @@ class Bomb(Item):
 class Obstacle(Item):
     moveable = False
     color = glcolor(74, 80, 72, 0xff)
+    modelName = 'tower'
 
     def die(self):
         pass
