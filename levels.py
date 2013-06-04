@@ -24,12 +24,16 @@ class Field(Sprite):
         self._map = {}
         self.size = size
         self.pos = w/2., h/2.
-        for x in xrange(w):
-            self.add_sprite(Obstacle(pos=(x, 0)))
-            self.add_sprite(Obstacle(pos=(x, h-1)))
+        for x in xrange(1, w-1):
+            self.add_sprite(Obstacle(pos=(x, 0), orient=(0, 1)))
+            self.add_sprite(Obstacle(pos=(x, h-1), orient=(0, -1)))
         for y in xrange(1, h-1):
-            self.add_sprite(Obstacle(pos=(0, y)))
-            self.add_sprite(Obstacle(pos=(w-1, y)))
+            self.add_sprite(Obstacle(pos=(0, y), orient=(1, 0)))
+            self.add_sprite(Obstacle(pos=(w-1, y), orient=(-1, 0)))
+        self.add_sprite(ObstacleCorner(pos=(0, 0), orient=(1, 1)))
+        self.add_sprite(ObstacleCorner(pos=(w-1, 0), orient=(-1, 1)))
+        self.add_sprite(ObstacleCorner(pos=(w-1, h-1), orient=(-1, -1)))
+        self.add_sprite(ObstacleCorner(pos=(0, h-1), orient=(1, -1)))
         self.init_texture()
 
     def init_texture(self):
@@ -211,5 +215,5 @@ class Level_test_3(Level):
 levels = [
     Level_test,
     Level_test_2,
-    Level_test_3
+    # Level_test_3
 ]

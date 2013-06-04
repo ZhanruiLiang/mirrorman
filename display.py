@@ -56,7 +56,6 @@ class Display(object):
 
         self.sprites = []
         self.staticSprites = []
-
         self.reshape()
         self.init_shadow_matrix()
 
@@ -91,6 +90,8 @@ class Display(object):
                 glPushMatrix()
                 x, y = sp.pos
                 glTranslate(x, y, 0)
+                ox, oy = sp.orient
+                glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
                 glDrawElements(GL_TRIANGLES, n, GL_UNSIGNED_INT, obj.indices)
                 glPopMatrix()
         glDisable(GL_TEXTURE_2D)
