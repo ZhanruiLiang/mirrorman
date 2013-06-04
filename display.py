@@ -34,7 +34,7 @@ def init():
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
     
-    glLineWidth(2)
+    glLineWidth(1)
     glMatrixMode(GL_MODELVIEW)
 
     glEnableClientState(GL_VERTEX_ARRAY)
@@ -145,7 +145,7 @@ class Display(object):
         glPushMatrix()
         glMultMatrixf(self.shadowMat)
         for sp in self.sprites:
-            if not (type(sp) is Lights):
+            if not isinstance(sp, Lights):
                 glPushMatrix()
                 x, y = sp.pos
                 glTranslate(x, y, 0)
@@ -170,7 +170,10 @@ class Display(object):
         glEnable(GL_LIGHTING)
 
     def add(self, sp):
-        self.sprites.append(sp)
+        if isinstance(sp, Lights):
+            self.lights = sp
+        else:
+            self.sprites.append(sp)
 
     def hint(self, text):
         print text
@@ -195,6 +198,12 @@ class Display(object):
         # self.drawShadow()
         self.drawSprites()
         self.drawReflectedSpritesAndField(field)
+
+        # draw lights
+        glPushMatrix()
+        # glTranslate(0, 0, 0)
+        self.lights.draw()
+        glPopMatrix()
 
         #see light location
         #glPushMatrix()

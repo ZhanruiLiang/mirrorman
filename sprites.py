@@ -1,6 +1,8 @@
 import pygame
 import math
+import random
 from config import GRID_SIZE, FPS, DD, DPT, SINGLE_ANIMATION
+import config
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from objReader import Model
@@ -85,6 +87,14 @@ class Item(Sprite):
     def die(self):
         if not self.dying:
             self.restTime = self.dieTime
+
+    def cur_pos(self):
+        if self._nextPos == self.pos:
+            return self.pos
+        x1, y1 = self.pos
+        x2, y2 = self._nextPos
+        t = self._pt
+        return x1 + t * (x2 - x1), y1 + t * (y2 - y1)
 
     def update2(self):
         if self.dying:
@@ -222,7 +232,7 @@ class Emitter(Item):
                     dx, dy = dx - tx2, dy - ty2
                 else:
                     alive = False
-                light.nodes.append(p1)
+                light.nodes.append(item.cur_pos())
                 if (p1, (dx, dy)) in vis: break
                 vis.add((p1, (dx, dy)))
             x, y = p1
@@ -232,7 +242,7 @@ class Goal(Item):
     color = glcolor(0xff, 0, 0, 0xff)
 
 class Light:
-    color = glcolor(0xee, 0, 0, 0x88)
+    color = glcolor(0, 0x91, 0xe5, 0x88)
     def __init__(self):
         self.nodes = []
 
@@ -251,8 +261,26 @@ class Obstacle(Item):
         pass
 
 class Lights(Sprite):
+    curDisplace = .5
+    curDetail = .05
+    curNum = 2
     def __init__(self):
         super(Lights, self).__init__()
+
+    def drawLighting(self, p1, p2, displace):
+        height = 1.5
+        if displace < self.curDetail:
+            glBegin(GL_LINES)
+            glVertex3d(p1[0], p1[1], height)
+            glVertex3d(p2[0], p2[1], height)
+            glEnd()
+        else:
+            midx = (p1[0] + p2[0]) / 2
+            midy = (p1[1] + p2[1]) / 2
+            midx += (random.random() - .5) * displace
+            midy += (random.random() - .5) * displace
+            self.drawLighting(p1, (midx, midy), displace/2)
+            self.drawLighting(p2, (midx, midy), displace/2)
 
     def redraw(self, emitters):
         gw, gh = GRID_SIZE
@@ -263,14 +291,18 @@ class Lights(Sprite):
 
     def draw(self):
         glDisable(GL_LIGHTING)
+        glDisable(GL_TEXTURE_2D)
         for light in self.lights:
             glColor4fv(light.color)
-            glBegin(GL_LINE_STRIP)
-            for p in light.nodes:
-                x, y = p
-                glVertex3d(x, y, 1.5)
-                
-            glEnd()
+            for i in xrange(0, len(light.nodes) - 1):
+                for j in xrange(0, self.curNum):
+                    self.drawLighting(light.nodes[i], light.nodes[i+1], self.curDisplace)
+            
+            #glBegin(GL_LINE_STRIP)
+            #for p in light.nodes:
+                #x, y = p
+                #glVertex3d(x, y, .5)
+            #glEnd()
         glEnable(GL_LIGHTING)
 
 class Player(AnimatedItem):
