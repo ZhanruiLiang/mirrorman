@@ -187,7 +187,7 @@ class Display(object):
         self.shadowMat = utils.convert_ctypes(
             shadowMat, ctypes.c_float, (len(shadowMat), ))
 
-    def draw_shadow(self):
+    def draw_shadow(self, field):
         #draw shadow stencil
         glClearStencil(0)
         glDisable(GL_DEPTH_TEST)
@@ -225,6 +225,7 @@ class Display(object):
         glDisable(GL_STENCIL_TEST)
 
         glEnable(GL_LIGHTING)
+        field.draw()
 
     def add(self, sp):
         if isinstance(sp, Lights):
@@ -256,7 +257,7 @@ class Display(object):
 
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
         
-        #self.draw_shadow()
+        #self.draw_shadow(field)
         self.draw_reflected(field)
         self.draw_sprites()
 
