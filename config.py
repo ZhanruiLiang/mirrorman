@@ -20,9 +20,25 @@ PLAYER_MODEL = 'robot.obj'
 #PLAYER_MODEL = 'capsule.obj'
 
 # FIELD_PIC_PATH = os.path.join("pictures", "71.jpg")
-FIELD_PIC_PATH = os.path.join("pictures", "window1.jpg")
+FIELD_PIC_PATH = os.path.join("pictures", "window4.jpg")
 # FIELD_PIC_PATH = os.path.join("models", "MarbleUTexture.jpg")
 
 SHADOW_COLOR = (.1, .1, .1, 1)
 BACK_COLOR = (0., 0., 0., 1)
 MIRROR_COLOR = (.5, .0, .5, .5)
+
+MODEL_DIR = 'models/'
+MODEL_SUBPATHS = [
+        'emitter.obj',
+        'emitter-explode/',
+        'mirror.obj',
+        'wall.obj',
+        'wall-corner.obj',
+        'mirrorman/mirrorman.obj',
+        'mirrorman/die/',
+        'mirrorman/push/',
+        'mirrorman/rest/',
+        'mirrorman/walk/',
+        ]
+DAT_PATH = 'models/models.dat'
+GZIP_LEVEL = 3

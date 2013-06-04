@@ -4,7 +4,6 @@ from OpenGL.GLUT import *
 import utils
 import ctypes
 import config
-from objReader import *
 
 PI = math.acos(-1.0)
 
@@ -113,7 +112,3 @@ class cylindarShape:
         glVertexPointer(3, GL_FLOAT, 0, self.cylindarV)
         glNormalPointer(GL_FLOAT, 0, self.cylindarN)
         glDrawElements(GL_TRIANGLES, len(self.cylindarI), GL_UNSIGNED_INT, self.cylindarI)
-
-class BasicShape(Model):
-    def __init__(self):
-        super(BasicShape, self).__init__(config.PLAYER_MODEL)

@@ -5,7 +5,7 @@ from config import GRID_SIZE, FPS, DD, DPT, MIRROR_COLOR
 import config
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-from objReader import Model
+from models import Model
 from animation import Animation, Animation2
 import shapes
 
@@ -175,6 +175,7 @@ class AnimatedItem(Item):
             self.animation = None
         else:
             self.animation = self.animations[aniName]
+            self.animation.start()
 
     def draw(self):
         if self._pt > 0:
@@ -263,30 +264,28 @@ class Goal(Obstacle):
     modelName = None
 
 class Lights(Sprite):
-    curDisplace = .02
-    curDetail = .001
+    curDisplace = .3
+    curDetail = .01
     curNum = 2
     curRedColor = 1.
     curRedColorIsAdd = False
-    curRedColorIncreaseRate = .1 / 20
+    curRedColorIncreaseRate = .1 / 10
+    curLength = .1
 
     def __init__(self):
         super(Lights, self).__init__()
 
-    def drawLighting(self, p1, p2, displace):
-        height = 1.5
-        if displace < self.curDetail:
-            glBegin(GL_LINES)
-            glVertex3d(p1[0], p1[1], height)
-            glVertex3d(p2[0], p2[1], height)
-            glEnd()
+    def drawLighting(self, p1, p2, displace, L):
+        if L < self.curLength or displace < self.curDetail:
+            self.nodes.append(p1)
+            self.nodes.append(p2)
         else:
-            midx = (p1[0] + p2[0]) / 2
-            midy = (p1[1] + p2[1]) / 2
-            midx += (random.random() - .5) * displace
-            midy += (random.random() - .5) * displace
-            self.drawLighting(p1, (midx, midy), displace/2)
-            self.drawLighting(p2, (midx, midy), displace/2)
+            pm = ((p1[0] + p2[0]) / 2 + (random.random() - .5) * displace,
+                    (p1[1] + p2[1]) / 2 + (random.random() - .5) * displace,
+                    (p1[2] + p2[2]) / 2 + (random.random() - .5) * displace
+                    )
+            self.drawLighting(p1, pm, displace/2, L/2)
+            self.drawLighting(pm, p2, displace/2, L/2)
 
     def redraw(self, emitters):
         gw, gh = GRID_SIZE
@@ -300,13 +299,26 @@ class Lights(Sprite):
         glDisable(GL_TEXTURE_2D)
 
         glEnable(GL_BLEND)
-        glColor4fv((self.curRedColor, 0., 0., 1.))
-        glLineWidth(4)
+        # glColor4fv((self.curRedColor, 0., 0., 1.))
+        glColor4fv((0., self.curRedColor, 0., 1.))
+        glLineWidth(1)
+        height = 1.5
         for light in self.lights:
-            #glColor4fv(light.color)
-            for i in xrange(0, len(light.nodes) - 1):
-                for j in xrange(0, self.curNum):
-                    self.drawLighting(light.nodes[i], light.nodes[i+1], self.curDisplace)  
+            for j in xrange(0, self.curNum):
+                self.nodes = []
+                #glColor4fv(light.color)
+                for i in xrange(0, len(light.nodes) - 1):
+                    dx = light.nodes[i+1][0] - light.nodes[i][0]
+                    dy = light.nodes[i+1][1] - light.nodes[i][1]
+                    L = math.hypot(dx, dy)
+                    self.drawLighting(
+                            light.nodes[i]+(height,), 
+                            light.nodes[i+1]+(height,), 
+                            self.curDisplace, L)  
+                glBegin(GL_LINE_STRIP)
+                for p in self.nodes:
+                    glVertex3f(*p)
+                glEnd()
             
         glEnable(GL_LIGHTING)
 
@@ -323,8 +335,7 @@ class Lights(Sprite):
 
 class Player(AnimatedItem):
     color = glcolor(69, 161, 17, 0xff)
-    # modelName = 'robot.obj'
-    modelName = 'mirrorman/mirrorman.obj'
+    # modelName = 'mirrorman/mirrorman.obj'
     Animations = [
             ('rest', 'mirrorman/rest'),
             ('push', 'mirrorman/push'),
@@ -352,12 +363,12 @@ class Player(AnimatedItem):
 
     def move(self, direction, push=False):
         if not push:
+            self.orient = direction
             if self.state != self.ST_WALKING:
                 self.state = self.ST_WALKING
                 self.switch('walk')
         else:
             self.push(direction)
-        self.orient = direction
         super(Player, self).move(direction)
 
     def update2(self):

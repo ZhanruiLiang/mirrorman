@@ -1,13 +1,18 @@
-import pygame
 import sys
+import objReader
+
+if '-m' in sys.argv[1:]:
+    objReader.make_dat()
+    exit(0)
+
+# import OpenGL_accelerate
+import pygame
 import config
 import display
 from display import Display
 from sprites import Goal, Lights
 from levels import Level, levels
 from camera import Camera
-import shapes
-
 
 clock = pygame.time.Clock()
 
@@ -16,6 +21,7 @@ def move((x, y), (dx, dy)):
 
 display.init()
 
+objReader.load_models()
 
 class Game:
     def move_player(self, player, direction):
@@ -87,7 +93,6 @@ class Game:
                     if key == pygame.K_q:
                         self._quit = True
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    print 'mouse event', event, event.button
                     if event.button == 4:
                         # scroll up, zoom in
                         self.camera.zoom_in()
