@@ -1,0 +1,12 @@
+# Blender MTL File: 'tower.blend'
+# Material Count: 1
+
+newmtl Material.001
+Ns 64.705882
+Ka 0.000000 0.000000 0.000000
+Kd 0.137167 0.139655 0.075144
+Ks 0.405602 0.412959 0.222199
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd wall.png

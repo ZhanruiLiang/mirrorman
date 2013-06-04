@@ -252,10 +252,13 @@ class Bomb(Item):
 class Obstacle(Item):
     moveable = False
     color = glcolor(74, 80, 72, 0xff)
-    modelName = 'tower.obj'
+    modelName = 'wall.obj'
 
     def die(self):
         pass
+
+class ObstacleCorner(Obstacle):
+    modelName = 'wall-corner.obj'
 
 class Goal(Obstacle):
     color = glcolor(0xff, 0, 0, 0xff)

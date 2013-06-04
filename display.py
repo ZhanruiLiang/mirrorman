@@ -69,7 +69,6 @@ class Display(object):
             for obj in sp.model.objects.itervalues():
                 if obj not in objs: objs[obj] = []
                 objs[obj].append(sp)
-        print objs
         self.staticDisplayListID = glGenLists(1)
         glNewList(self.staticDisplayListID, GL_COMPILE)
         for obj, sprites in objs.iteritems():
@@ -90,6 +89,8 @@ class Display(object):
                 glPushMatrix()
                 x, y = sp.pos
                 glTranslate(x, y, 0)
+                ox, oy = sp.orient
+                glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
                 glDrawElements(GL_TRIANGLES, n, GL_UNSIGNED_INT, obj.indices)
                 glPopMatrix()
         glEndList()

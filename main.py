@@ -115,7 +115,7 @@ class Game:
             # tick
             timer.tick(config.FPS)
             clock.tick()
-            if fcnt % 30 == 0: print clock.get_fps()
+            if fcnt % config.FPS== 0: print clock.get_fps()
             fcnt += 1
 
 game = Game()
