@@ -1,0 +1,22 @@
+# Blender MTL File: 'mirror.blend'
+# Material Count: 2
+
+newmtl Material.001
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.313258 0.190718 0.099817
+Ks 0.168582 0.099035 0.048794
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd MarbleUTexture.jpg
+
+newmtl Material.002
+Ns 168.627451
+Ka 0.000000 0.000000 0.000000
+Kd 0.483052 0.483052 0.483052
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 0.450000
+illum 2
+map_Kd mirrorsurface.png

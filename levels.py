@@ -62,9 +62,9 @@ class Field(Sprite):
 
     def update_sprite(self, sp, oldPos):
         x0, y0 = oldPos
+        if self._map[x0, y0] is sp:
+            del self._map[x0, y0]
         x, y = sp.pos
-        assert self._map[x0, y0] == sp
-        del self._map[x0, y0]
         self._map[x, y] = sp
 
     def remove_sprite_at(self, pos):
@@ -174,15 +174,15 @@ class Level_test_2(Level):
         A = self.add
 
         A(Player(pos=(4, 7)))
-        # A(Emitter(pos=(2, 9), orient=(0, -1)))
-        # A(Emitter(pos=(9, 8), orient=(-1, 0)))
-        # A(Obstacle(pos=(6, 1)))
-        # A(Obstacle(pos=(7, 1)))
-        # A(Obstacle(pos=(8, 1)))
-        # A(Mirror(pos=(2, 2), orient=(1, 1)))
-        # A(Mirror(pos=(9, 2), orient=(-1, 1)))
-        # A(Mirror(pos=(9, 6), orient=(-1, -1)))
-        # A(Mirror(pos=(4, 3), orient=(0, 1)))
+        A(Emitter(pos=(2, 9), orient=(0, -1)))
+        A(Emitter(pos=(9, 8), orient=(-1, 0)))
+        A(Obstacle(pos=(6, 1)))
+        A(Obstacle(pos=(7, 1)))
+        A(Obstacle(pos=(8, 1)))
+        A(Mirror(pos=(2, 2), orient=(1, 1)))
+        A(Mirror(pos=(9, 2), orient=(-1, 1)))
+        A(Mirror(pos=(9, 6), orient=(-1, -1)))
+        A(Mirror(pos=(4, 3), orient=(0, 1)))
         A(Goal(pos=(5, 0), orient=(0, 1)))
 
         self.collect()

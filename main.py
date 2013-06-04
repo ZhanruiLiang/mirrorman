@@ -34,7 +34,6 @@ class Game:
                     canGo = False
                 else:
                     item1.move(direction)
-                    self.field.update_sprite(item1, (x, y))
         if canGo:
             player.move(direction, push)
         else:

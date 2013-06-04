@@ -33,6 +33,13 @@ class Object(object):
             glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse)
             glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular)
             glMaterialfv(GL_FRONT, GL_SHININESS, material.shininess)
+            
+            # TODO
+            # if material.alpha < 1-1e-8:
+            #     glEnable(GL_BLEND)
+            #     glBlendEquation(GL_FUNC_ADD)
+            #     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            #     glDisable(GL_BLEND)
         else: glDisable(GL_TEXTURE_2D)
 
         if material:
@@ -40,8 +47,6 @@ class Object(object):
         glPushMatrix()
         glInterleavedArrays(GL_T2F_N3F_V3F, 0, self.vdata)
         glMultMatrixf(self.aniMat)
-        # print self.name
-        # print glGetFloatv(GL_MODELVIEW_MATRIX)
         glDrawElements(GL_TRIANGLES, len(self.indices),
                        GL_UNSIGNED_INT, self.indices)
         glPopMatrix()
@@ -99,8 +104,8 @@ class Model(object):
                 v = map(float, v[1:3])
                 self.texcoords.append(v)
             elif v[0] == 'mtllib':
-                print mtlBaseDir, v[1]
-                self.mtllib = MaterialLib.load(os.path.join(mtlBaseDir, v[1]))
+                self.mtllib = MaterialLib.load(os.path.realpath(
+                    os.path.join(mtlBaseDir, v[1])))
             elif v[0] == 'f':
                 assert len(v) == 4
                 self.add_face(obj, v[1:])
@@ -177,7 +182,7 @@ class MaterialLib(object):
             elif v[0] == 'Ks':
                 mtl.specular = map(float, v[1:4])
             elif v[0] == 'Ns':
-                mtl.shininess = float(v[1])
+                mtl.shininess = min(128., float(v[1]))
             elif v[0] == 'd' or v[0] == 'Tr':
                 mtl.alpha = float(v[1])
             elif v[0] == 'map_Kd':
@@ -204,7 +209,7 @@ class MaterialLib(object):
 
         for material in materials.itervalues():
             material.convert()
-        # print 'mtllib {}, load time: {}'.format(filepath, tm.tick())
+        print 'mtllib {}, load time: {}'.format(filepath, tm.tick())
 
     @staticmethod
     def load(filepath):

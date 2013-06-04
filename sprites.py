@@ -1,7 +1,6 @@
 import pygame
 import math
-from config import GRID_SIZE, FPS, DD
-import config
+from config import GRID_SIZE, FPS, DD, DPT, SINGLE_ANIMATION
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from objReader import Model
@@ -67,11 +66,14 @@ class Item(Sprite):
             self.model = Model.load(self.modelName)
         else:
             self.model = None
+        self._pt = 0
+        self._nextPos = pos
 
     def move(self, direction):
         x, y = self.pos
         dx, dy = direction
-        self.pos = x, y = x + dx, y + dy
+        self._nextPos = x + dx, y + dy
+        self._pt = 0
 
     def kill(self):
         self.alive = False
@@ -90,6 +92,13 @@ class Item(Sprite):
             if self.restTime == 0:
                 self.kill()
                 self.field.remove_sprite(self)
+        if self.pos != self._nextPos and self._pt < 1:
+            self._pt += DPT
+            if self._pt >= 1-1e-8:
+                oldPos  = self.pos
+                self.pos = self._nextPos
+                self.field.update_sprite(self, oldPos)
+                self._pt = 0
 
     def setMaterial(self, color):
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color)
@@ -97,6 +106,14 @@ class Item(Sprite):
         glMaterialf(GL_FRONT, GL_SHININESS, .5)
 
     def draw(self):
+        if self._pt > 0:
+            x1, y1 = self._nextPos
+            x0, y0 = self.pos
+            dx, dy = x1 - x0, y1 - y0
+            t = self._pt
+            glTranslated(dx * t, dy * t, 0)
+        ox, oy = self.orient
+        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
         if self.model:
             self.model.draw()
         else:
@@ -135,13 +152,22 @@ class AnimatedItem(Item):
         self.animation = self.animations[aniName]
 
     def draw(self):
+        if self._pt > 0:
+            x1, y1 = self._nextPos
+            x0, y0 = self.pos
+            dx, dy = x1 - x0, y1 - y0
+            t = self._pt
+            glTranslated(dx * t, dy * t, 0)
+        ox, oy = self.orient
+        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
         self.animation.draw()
 
 class Mirror(Item):
     color = glcolor(168, 255, 235, 0xff)
     reflective = True
+    modelName = 'mirror.obj'
 
-    def draw(self):
+    def draw1(self):
         angle = math.degrees(math.atan2(self.orient[1], self.orient[0]))
 
         # draw mirror base
@@ -172,6 +198,7 @@ class Mirror(Item):
 class Emitter(Item):
     color = glcolor(147, 17, 161, 0xff)
     MAX_LENGTH = 1000
+    modelName = 'emitter.obj'
     def calculate(self, field):
         x, y = self.pos
         dx, dy = self.orient
@@ -241,7 +268,7 @@ class Lights(Sprite):
             glBegin(GL_LINE_STRIP)
             for p in light.nodes:
                 x, y = p
-                glVertex3d(x, y, .5)
+                glVertex3d(x, y, 1.5)
                 
             glEnd()
         glEnable(GL_LIGHTING)
@@ -258,14 +285,13 @@ class Player(AnimatedItem):
         # self.load_animation('walk', 'walk.ani')
         # self.switch('walk')
         self.load_animation('rest', 'mirrorman/rest', type=2)
-        if config.SINGLE_ANIMATION:
+        if SINGLE_ANIMATION:
             self.animations['push'] = self.animations['rest']
             self.animations['walk'] = self.animations['rest']
         else:
             self.load_animation('push', 'mirrorman/push', type=2)
             self.load_animation('walk', 'mirrorman/walk', type=2)
         self.state = None
-        self._pt = 0
         self.rest()
 
     def push(self, direction):
@@ -286,22 +312,12 @@ class Player(AnimatedItem):
                 self.switch('walk')
         else:
             self.push(direction)
-        x, y = self.pos
-        dx, dy = self.orient = direction
-        self._nextPos = x + dx, y + dy
-        self._pt = 0
-
-    def draw(self):
-        ox, oy = self.orient
-        t = self._pt
-        # glutWireCube(1)
-        glTranslated(ox * t, oy * t, 0)
-        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
-        super(Player, self).draw()
+        self.orient = direction
+        super(Player, self).move(direction)
 
     def update2(self):
         if self.state != self.ST_REST and self.pos != self._nextPos and self._pt < 1:
-            self._pt += 0.1
+            self._pt += DPT
             if self._pt >= 1-1e-8:
                 oldPos  = self.pos
                 self.pos = self._nextPos
