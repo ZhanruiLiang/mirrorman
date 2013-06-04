@@ -56,6 +56,9 @@ class Game:
             display.add(sp)
         lights = self.lights = Lights()
         display.add(lights)
+        self.camera = Camera(self.field)
+        self.camera.trace_target(self.player)
+        display.set_camera(self.camera)
 
     def end_game(self, win):
         self._ended = True
@@ -68,15 +71,12 @@ class Game:
     def play(self, level):
         self.load_level(level)
         self.init_display()
-        self.camera = Camera(level.player.pos)
         display = self.display
         self._quit = False
         self._win = False
         self._ended = False
         timer = pygame.time.Clock()
         fcnt = 0
-        newDir = None
-
 
         while not self._quit:
             for event in pygame.event.get():
@@ -86,13 +86,14 @@ class Game:
                     key = event.key
                     if key == pygame.K_q:
                         self._quit = True
-                    #camera view event demo
-                    elif key == pygame.K_1:
-                        self.camera.adjust(1)
-                    elif key == pygame.K_2:
-                        self.camera.adjust(-1)
-                    else:
-                        newDir = config.Dirs.get(key, None)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    print 'mouse event', event, event.button
+                    if event.button == 4:
+                        # scroll up, zoom in
+                        self.camera.zoom_in()
+                    elif event.button == 5:
+                        # scroll down, zoom out
+                        self.camera.zoom_out()
             # update logic
             if not self._ended and fcnt % config.DD == 0:
                 # update player pos
@@ -105,7 +106,6 @@ class Game:
                             break
                     else:
                         self.player.rest()
-                    self.camera.update(self.player.pos)
                 # recalculate lights
                 for emitter in self.emitters:
                     emitter.calculate(self.field)
@@ -120,8 +120,7 @@ class Game:
                 if self.player.dying:
                     self.end_game(False)
             # update display
-
-            display.update(self.field, self.camera)
+            display.update(self.field)
             # tick
             timer.tick(config.FPS)
             clock.tick()

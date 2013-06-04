@@ -60,6 +60,10 @@ class Display(object):
         self.init_shadow_matrix()
 
         self.staticDisplayListID = None
+        self.camera = None
+
+    def set_camera(self, camera):
+        self.camera = camera
 
     def process_statics(self):
         # sprite in objs[sprite.model.objects[i]]
@@ -238,7 +242,7 @@ class Display(object):
         print text
         # self.add(Hint(((100, 100), (300, 100)), text))
 
-    def update(self, field, camera):
+    def update(self, field):
         self.sprites = [sp for sp in self.sprites if sp.alive]
         for sp in self.sprites:
             sp.update()
@@ -246,17 +250,17 @@ class Display(object):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
                     GL_STENCIL_BUFFER_BIT)
         glLoadIdentity()
-        #gluLookAt(*self.eyePos + self.centerPos + (0., 0., 1.))
+        self.camera.update()
 
         gw, gh = config.GRID_SIZE
         gt = (gw + gh)/2
         glTranslate(gw/2., gh/2., 0)
         glScale(gw, gh, gt)
-        camera.mul_view_matrix()
+        self.camera.mul_view_matrix()
 
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
         
-        #self.draw_shadow(field)
+        # self.draw_shadow(field)
         self.draw_reflected(field)
         self.draw_sprites()
 

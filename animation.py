@@ -2,6 +2,7 @@ import os, sys
 import re
 import ctypes
 import utils
+import config
 from objReader import Model
 import objReader
 
@@ -36,9 +37,12 @@ class Animation(object):
             else:
                 print 'In line {}, unknown command "{}"'.format(lineID, opr)
 
+        self.loop = True
+        self._pause = False
         self.start()
 
     def step(self):
+        if self._pause: return
         fi = self.frame
         data = self.data
         for name, obj in self.sprite.model.objects.iteritems():
@@ -50,6 +54,13 @@ class Animation(object):
 
     def start(self):
         self.frame = 0
+        self._pause = False
+
+    def toggle(self):
+        self._pause = not self._pause
+
+    def pause(self):
+        self._pause = True
 
 class Animation2(Animation):
     def __init__(self, aniFolder, sprite):
@@ -57,21 +68,24 @@ class Animation2(Animation):
         filenames = os.listdir(os.path.join(objReader.baseDir, aniFolder))
         xs = [(self.extract_num(x),x) for x in filenames if self.extract_num(x) is not None]
         xs.sort()
-        self.nFrames = len(xs)
         self.frameModels = []
-        # i0 = xs[0][0]
+        cnt = 0
         for i, x in xs:
+            if cnt == config.ANIMATION_CUT: break
             model = Model.load(os.path.join(aniFolder, x))
             self.frameModels.append(model)
+            cnt += 1
+        self.nFrames = len(self.frameModels)
 
+        self.loop = True
         self.start()
 
-    def start(self):
-        self.frame = 0
-
     def step(self):
+        if self._pause: return
         self.sprite.model = self.model = self.frameModels[self.frame]
         self.frame = (self.frame + 1) % self.nFrames
+        if not self.loop and self.frame == 0:
+            self.pause()
 
     def draw(self):
         self.model.draw()

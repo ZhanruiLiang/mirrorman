@@ -1,8 +1,7 @@
 import pygame
 import math
 import random
-from config import GRID_SIZE, FPS, DD, DPT, SINGLE_ANIMATION,\
-    MIRROR_COLOR
+from config import GRID_SIZE, FPS, DD, DPT, MIRROR_COLOR
 import config
 from OpenGL.GL import *
 from OpenGL.GLUT import *
@@ -91,6 +90,9 @@ class Item(Sprite):
             self.restTime = self.DieTime
             self.on_die()
 
+    def on_die(self):
+        pass
+
     def cur_pos(self):
         if self._nextPos == self.pos:
             return self.pos
@@ -159,6 +161,10 @@ class AnimatedItem(Item):
         self.animations[aniName] = ani
         # if not self.animation: self.animation = ani
 
+    def on_die(self):
+        self.switch('die')
+        self.animation.loop = False
+
     def update(self):
         super(AnimatedItem, self).update()
         if self.animation:
@@ -194,14 +200,11 @@ class Emitter(AnimatedItem):
     MAX_LENGTH = 1000
     modelName = 'emitter.obj'
     Animations = [
-            ('explode', 'emitter-explode/'),
+            ('die', 'emitter-explode/'),
         ]
 
     def __init__(self, pos=(0, 0), orient=(1, 0)):
         super(Emitter, self).__init__(pos, orient)
-
-    def on_die(self):
-        self.switch('explode')
 
     def calculate(self, field):
         x, y = self.pos
@@ -261,7 +264,7 @@ class Goal(Obstacle):
 
 class Lights(Sprite):
     curDisplace = .5
-    curDetail = .10
+    curDetail = .01
     curNum = 2
     def __init__(self):
         super(Lights, self).__init__()
@@ -303,18 +306,12 @@ class Player(AnimatedItem):
     color = glcolor(69, 161, 17, 0xff)
     # modelName = 'robot.obj'
     modelName = 'mirrorman/mirrorman.obj'
-    if not SINGLE_ANIMATION:
-        Animations = [
-                ('rest', 'mirrorman/rest'),
-                ('push', 'mirrorman/push'),
-                ('walk', 'mirrorman/walk'),
-            ]
-    else:
-        Animations = [
-                ('rest', 'mirrorman/rest'),
-                ('push', 'mirrorman/rest'),
-                ('walk', 'mirrorman/rest'),
-            ]
+    Animations = [
+            ('rest', 'mirrorman/rest'),
+            ('push', 'mirrorman/push'),
+            ('walk', 'mirrorman/walk'),
+            ('die', 'mirrorman/die'),
+        ]
 
     ST_REST, ST_WALKING, ST_PUSHING = 0, 1, 2
 
