@@ -263,9 +263,13 @@ class Goal(Obstacle):
     modelName = None
 
 class Lights(Sprite):
-    curDisplace = .5
-    curDetail = .01
+    curDisplace = .02
+    curDetail = .001
     curNum = 2
+    curRedColor = 1.
+    curRedColorIsAdd = False
+    curRedColorIncreaseRate = .1 / 20
+
     def __init__(self):
         super(Lights, self).__init__()
 
@@ -294,13 +298,28 @@ class Lights(Sprite):
     def draw(self):
         glDisable(GL_LIGHTING)
         glDisable(GL_TEXTURE_2D)
+
+        glEnable(GL_BLEND)
+        glColor4fv((self.curRedColor, 0., 0., 1.))
+        glLineWidth(4)
         for light in self.lights:
-            glColor4fv(light.color)
+            #glColor4fv(light.color)
             for i in xrange(0, len(light.nodes) - 1):
                 for j in xrange(0, self.curNum):
-                    self.drawLighting(light.nodes[i], light.nodes[i+1], self.curDisplace)
+                    self.drawLighting(light.nodes[i], light.nodes[i+1], self.curDisplace)  
             
         glEnable(GL_LIGHTING)
+
+    def update(self):
+        
+        if self.curRedColorIsAdd:
+            self.curRedColor += self.curRedColorIncreaseRate
+            if self.curRedColor >= 1:
+                self.curRedColorIsAdd = False
+        else:
+            self.curRedColor -= self.curRedColorIncreaseRate
+            if self.curRedColor <= .3:
+                self.curRedColorIsAdd = True
 
 class Player(AnimatedItem):
     color = glcolor(69, 161, 17, 0xff)

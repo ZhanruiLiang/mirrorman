@@ -26,10 +26,12 @@ def init():
 
     glClearColor(*config.BACK_COLOR)
 
-    glLight(GL_LIGHT0, GL_AMBIENT, (.2, .2, .2, 1.))
-    glLight(GL_LIGHT0, GL_DIFFUSE, (.7, .7, .7, 1.))
-    glLight(GL_LIGHT0, GL_SPECULAR, (.2, .2, .2, 1.))
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (.2, .2, .2, 1.))
+    glLight(GL_LIGHT0, GL_AMBIENT, (.5, .5, .5, 1.))
+    glLight(GL_LIGHT0, GL_DIFFUSE, (.8, .8, .8, 1.))
+    glLight(GL_LIGHT0, GL_SPECULAR, (.5, .5, .5, 1.))
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (.4, .4, .4, 1.))
+    #if you want to adjust light intensity, edit here
+    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, .1)
     
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
@@ -80,7 +82,7 @@ class Display(object):
             material = obj.material
             if material:
                 glEnable(GL_TEXTURE_2D)
-                glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+                glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
                 
                 glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient)
                 glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse)
@@ -259,8 +261,8 @@ class Display(object):
         self.camera.mul_view_matrix()
 
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
-        
-        # self.draw_shadow(field)
+
+        #self.draw_shadow(field)
         self.draw_reflected(field)
         self.draw_sprites()
 
@@ -271,6 +273,7 @@ class Display(object):
         glPushMatrix()
         # glTranslate(0, 0, 0)
         self.lights.draw()
+        self.lights.update()
         glPopMatrix()
 
         #see light location

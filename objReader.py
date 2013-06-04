@@ -35,16 +35,16 @@ class Object(object):
         resetLight = False
         if material: 
             glEnable(GL_TEXTURE_2D)
-            # glDisable(GL_LIGHTING)
-            if material.alpha < 1-1e-8:
-                glEnable(GL_BLEND)
-                glDisable(GL_LIGHTING)
-                resetLight = True
-                glBlendEquation(GL_FUNC_ADD)
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-                d = material.diffuse
-                glColor4f(d[0], d[1], d[2], material.alpha)
-            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+            # if material.alpha < 1-1e-8:
+            #     glEnable(GL_BLEND)
+            #     glDisable(GL_LIGHTING)
+            #     resetLight = True
+            #     glBlendEquation(GL_FUNC_ADD)
+            #     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            #     d = material.diffuse
+            #     glColor4f(d[0], d[1], d[2], material.alpha)
+            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+            
             glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient)
             glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse)
             glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular)
