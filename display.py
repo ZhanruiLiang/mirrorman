@@ -112,10 +112,12 @@ class Display(object):
     def draw_sprites(self):
         if self.staticDisplayListID is None:
             self.process_statics()
-        mirrorList = []
 
+        glCallList(self.staticDisplayListID)
+        mirrorList = []
         for sp in self.sprites:
-            if isinstance(sp, Mirror): mirrorList.append(sp)
+            if isinstance(sp, Mirror): 
+                mirrorList.append(sp)
             else:
                 glPushMatrix()
                 x, y = sp.pos
@@ -123,7 +125,7 @@ class Display(object):
                 sp.draw()
                 glPopMatrix()
 
-        glDisable(GL_TEXTURE_2D)
+        # glDisable(GL_TEXTURE_2D)
         for mirror in mirrorList:
             glPushMatrix()
             x, y = mirror.pos
@@ -131,7 +133,6 @@ class Display(object):
             mirror.draw()
             glPopMatrix()
 
-        glCallList(self.staticDisplayListID)
 
     def draw_reflected(self, field):
         glClearStencil(0)

@@ -32,21 +32,24 @@ class Object(object):
 
     def draw(self):
         material = self.material
+        resetLight = False
         if material: 
             glEnable(GL_TEXTURE_2D)
+            # glDisable(GL_LIGHTING)
+            if material.alpha < 1-1e-8:
+                glEnable(GL_BLEND)
+                glDisable(GL_LIGHTING)
+                resetLight = True
+                glBlendEquation(GL_FUNC_ADD)
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                d = material.diffuse
+                glColor4f(d[0], d[1], d[2], material.alpha)
             glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
-            
             glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient)
             glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse)
             glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular)
             glMaterialfv(GL_FRONT, GL_SHININESS, material.shininess)
             
-            # TODO
-            # if material.alpha < 1-1e-8:
-            #     glEnable(GL_BLEND)
-            #     glBlendEquation(GL_FUNC_ADD)
-            #     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-            #     glDisable(GL_BLEND)
         else: glDisable(GL_TEXTURE_2D)
 
         if material:
@@ -57,10 +60,10 @@ class Object(object):
         glDrawElements(GL_TRIANGLES, len(self.indices),
                        GL_UNSIGNED_INT, self.indices)
         glPopMatrix()
-
-        # is these line needed ?
-        # glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
-        # glDisable(GL_TEXTURE_2D)
+        glDisable(GL_BLEND)
+        glDisable(GL_TEXTURE_2D)
+        if resetLight:
+            glEnable(GL_LIGHTING)
 
 models = {}
 class Model(object):
