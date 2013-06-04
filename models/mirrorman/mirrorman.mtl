@@ -9,4 +9,4 @@ Ks 0.034374 0.018340 0.008209
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd ../mirrormanskin.png
+map_Kd textures/mirrormanskin.png

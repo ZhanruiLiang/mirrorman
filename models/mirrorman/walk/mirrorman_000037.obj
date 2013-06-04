@@ -1,6 +1,6 @@
 # Blender v2.67 (sub 0) OBJ File: 'mirrorman.blend'
 # www.blender.org
-mtllib mirrorman_000037.mtl
+mtllib ../mirrorman.mtl
 v 0.707107 0.707107 0.000000
 v 0.707107 -0.707107 0.000000
 v -0.707107 0.707107 0.000000
