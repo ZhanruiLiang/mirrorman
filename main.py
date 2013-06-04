@@ -129,4 +129,4 @@ class Game:
             fcnt += 1
 
 game = Game()
-game.play(levels[-1]())
+game.play(levels[1]())

@@ -92,6 +92,7 @@ class Field(Sprite):
         w, h = self.size
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, self.texid)
+        glColor4fv((1., 1., 1., .7))
         glBegin(GL_QUADS)
         #glTexCoord2f(.0, .0)
         #glVertex3f(-14., -14., .0)
@@ -101,7 +102,7 @@ class Field(Sprite):
         #glVertex3f(90., 90., .0)
         #glTexCoord2f(float(90)/15, 0.)
         #glVertex3f(90., -14., .0)
-
+        glNormal3fv((0., 0., 1.))
         glTexCoord2f(.0, .0)
         glVertex3f(-20., -20., .0)
         glTexCoord2f(0., 8.)
@@ -121,7 +122,6 @@ class Field(Sprite):
         #glTexCoord2f(float(w)/15, .0)
         #glVertex3f(w, -1., .0)
         glEnd()
-
         #glScale(self.size[0], self.size[1], 0.01)
         #glDisable(GL_LIGHTING)
         #glColor3d(.6, .6, .5)

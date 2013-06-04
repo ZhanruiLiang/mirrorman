@@ -34,7 +34,7 @@ class Object(object):
         material = self.material
         if material: 
             glEnable(GL_TEXTURE_2D)
-            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
             
             glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient)
             glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse)
