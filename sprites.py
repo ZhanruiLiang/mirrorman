@@ -1,5 +1,5 @@
 import pygame
-import math
+import math, random
 from config import GRID_SIZE, FPS, DD
 import config
 from OpenGL.GL import *
@@ -226,6 +226,23 @@ class Obstacle(Item):
 class Lights(Sprite):
     def __init__(self):
         super(Lights, self).__init__()
+        self.curDisplace = 5
+        self.curDetail = 3
+        self.curNum = 2
+
+    def drawLighting(self, p1, p2, displace):
+        if displace < self.curDetail:
+            glBegin(GL_LINES)
+            glVertex3d(p1[0], p1[1], .5)
+            glVertex3d(p2[0], p2[1], .5)
+            glEnd()
+        else:
+            midx = (p1[0] + p2[0]) / 2
+            midy = (p1[1] + p2[1]) / 2
+            midx += (random.random() - .5) * displace * .05
+            midy += (random.random() - .5) * displace * .05
+            self.drawLighting(p1, (midx, midy), displace/2)
+            self.drawLighting(p2, (midx, midy), displace/2)
 
     def redraw(self, emitters):
         gw, gh = GRID_SIZE
@@ -238,12 +255,15 @@ class Lights(Sprite):
         glDisable(GL_LIGHTING)
         for light in self.lights:
             glColor4fv(light.color)
-            glBegin(GL_LINE_STRIP)
-            for p in light.nodes:
-                x, y = p
-                glVertex3d(x, y, .5)
-                
-            glEnd()
+            for i in xrange(0, len(light.nodes) - 1):
+                for j in xrange(0, self.curNum):
+                    self.drawLighting(light.nodes[i], light.nodes[i+1], self.curDisplace)
+            
+            #glBegin(GL_LINE_STRIP)
+            #for p in light.nodes:
+                #x, y = p
+                #glVertex3d(x, y, .5)
+            #glEnd()
         glEnable(GL_LIGHTING)
 
 class Player(AnimatedItem):
