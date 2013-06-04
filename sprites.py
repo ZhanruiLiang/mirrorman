@@ -281,7 +281,8 @@ class Emitter(Item):
         light.end = item
 
 class Light:
-    color = glcolor(0, 0x91, 0xe5, 0x88)
+    #color = glcolor(0, 0x91, 0xe5, 0x88)
+    color = glcolor(0xff, 0, 0, 0xff)
     def __init__(self):
         self.nodes = []
 
