@@ -215,5 +215,5 @@ class Level_test_3(Level):
 levels = [
     Level_test,
     Level_test_2,
-    # Level_test_3
+    # Level_test_3,
 ]

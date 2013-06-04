@@ -1,0 +1,42 @@
+# Blender MTL File: 'emitter.blend'
+# Material Count: 4
+
+newmtl Material.001
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.313258 0.190718 0.099817
+Ks 0.168582 0.099035 0.048794
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ../MarbleUTexture.jpg
+
+newmtl Material.003
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.314491 0.299549 0.307940
+Ks 0.195786 0.188131 0.193215
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ../emittercover.png
+
+newmtl ball
+Ns 129.411765
+Ka 0.000000 0.000000 0.000000
+Kd 0.191533 0.473248 0.568443
+Ks 0.202638 0.502026 0.602120
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ../emitterball.png
+
+newmtl cover
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.230939 0.230939 0.230939
+Ks 0.322240 0.322240 0.322240
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ../emittercover.png

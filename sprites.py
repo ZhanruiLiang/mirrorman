@@ -58,7 +58,7 @@ class Item(Sprite):
     color = glcolor(154, 189, 225, 255)
     reflective = False
     moveable = True
-    dieTime = 10
+    DieTime = 10
     field = None
     modelName = None
 
@@ -88,7 +88,8 @@ class Item(Sprite):
 
     def die(self):
         if not self.dying:
-            self.restTime = self.dieTime
+            self.restTime = self.DieTime
+            self.on_die()
 
     def cur_pos(self):
         if self._nextPos == self.pos:
@@ -142,10 +143,13 @@ class Item(Sprite):
             cylindar.draw()
 
 class AnimatedItem(Item):
+    Animations = []
     def __init__(self, pos=(0, 0), orient=(1, 0)):
         super(AnimatedItem, self).__init__(pos, orient)
         self.animations = {}
         self.animation = None
+        for aniName, aniPath in self.Animations:
+            self.load_animation(aniName, aniPath, 2)
 
     def load_animation(self, aniName, aniPath, type=1):
         if type == 1:
@@ -161,7 +165,10 @@ class AnimatedItem(Item):
             self.animation.step()
 
     def switch(self, aniName):
-        self.animation = self.animations[aniName]
+        if aniName is None:
+            self.animation = None
+        else:
+            self.animation = self.animations[aniName]
 
     def draw(self):
         if self._pt > 0:
@@ -172,17 +179,30 @@ class AnimatedItem(Item):
             glTranslated(dx * t, dy * t, 0)
         ox, oy = self.orient
         glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
-        self.animation.draw()
+        if self.animation:
+            self.animation.draw()
+        elif self.model:
+            self.model.draw()
 
 class Mirror(Item):
     color = glcolor(168, 255, 235, 0xff)
     reflective = True
     modelName = 'mirror.obj'
 
-class Emitter(Item):
+class Emitter(AnimatedItem):
     color = glcolor(147, 17, 161, 0xff)
     MAX_LENGTH = 1000
     modelName = 'emitter.obj'
+    Animations = [
+            ('explode', 'emitter-explode/'),
+        ]
+
+    def __init__(self, pos=(0, 0), orient=(1, 0)):
+        super(Emitter, self).__init__(pos, orient)
+
+    def on_die(self):
+        self.switch('explode')
+
     def calculate(self, field):
         x, y = self.pos
         dx, dy = self.orient
@@ -276,31 +296,29 @@ class Lights(Sprite):
                 for j in xrange(0, self.curNum):
                     self.drawLighting(light.nodes[i], light.nodes[i+1], self.curDisplace)
             
-            #glBegin(GL_LINE_STRIP)
-            #for p in light.nodes:
-                #x, y = p
-                #glVertex3d(x, y, .5)
-            #glEnd()
         glEnable(GL_LIGHTING)
 
 class Player(AnimatedItem):
     color = glcolor(69, 161, 17, 0xff)
     # modelName = 'robot.obj'
     modelName = 'mirrorman/mirrorman.obj'
+    if not SINGLE_ANIMATION:
+        Animations = [
+                ('rest', 'mirrorman/rest'),
+                ('push', 'mirrorman/push'),
+                ('walk', 'mirrorman/walk'),
+            ]
+    else:
+        Animations = [
+                ('rest', 'mirrorman/rest'),
+                ('push', 'mirrorman/rest'),
+                ('walk', 'mirrorman/rest'),
+            ]
 
     ST_REST, ST_WALKING, ST_PUSHING = 0, 1, 2
 
     def __init__(self, pos=(0, 0), orient=(1, 0)):
         super(Player, self).__init__(pos, orient)
-        # self.load_animation('walk', 'walk.ani')
-        # self.switch('walk')
-        self.load_animation('rest', 'mirrorman/rest', type=2)
-        if SINGLE_ANIMATION:
-            self.animations['push'] = self.animations['rest']
-            self.animations['walk'] = self.animations['rest']
-        else:
-            self.load_animation('push', 'mirrorman/push', type=2)
-            self.load_animation('walk', 'mirrorman/walk', type=2)
         self.state = None
         self.rest()
 

@@ -76,7 +76,7 @@ class Animation2(Animation):
     def draw(self):
         self.model.draw()
 
-    ExtractPattern = re.compile(r'\w+_(?P<num>\d+)\.obj')
+    ExtractPattern = re.compile(r'.+_(?P<num>\d+)\.obj')
     @staticmethod
     def extract_num(filename):
         mch = Animation2.ExtractPattern.match(filename)
