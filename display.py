@@ -27,8 +27,8 @@ def init():
     glClearColor(*config.BACK_COLOR)
 
     glLight(GL_LIGHT0, GL_AMBIENT, (.2, .2, .2, 1.))
-    glLight(GL_LIGHT0, GL_DIFFUSE, (.8, .8, .8, 1.))
-    glLight(GL_LIGHT0, GL_SPECULAR, (.3, .3, .3, 1.))
+    glLight(GL_LIGHT0, GL_DIFFUSE, (.7, .7, .7, 1.))
+    glLight(GL_LIGHT0, GL_SPECULAR, (.2, .2, .2, 1.))
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (.2, .2, .2, 1.))
     
     glEnable(GL_LIGHTING)
@@ -106,8 +106,9 @@ class Display(object):
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
-        self.eyePos = (w * .5, (-0.1) * h, h*(1.0))
-        self.centerPos = (w/2., h/2., 0.)
+        #self.eyePos = (w * .5, (-0.1) * h, h*(1.0))
+        #self.centerPos = (w/2., h/2., 0.)
+        
 
     def draw_sprites(self):
         if self.staticDisplayListID is None:
@@ -132,7 +133,6 @@ class Display(object):
             glTranslate(x, y, 0)
             mirror.draw()
             glPopMatrix()
-
 
     def draw_reflected(self, field):
         glClearStencil(0)
@@ -237,7 +237,7 @@ class Display(object):
         print text
         # self.add(Hint(((100, 100), (300, 100)), text))
 
-    def update(self, field):
+    def update(self, field, camera):
         self.sprites = [sp for sp in self.sprites if sp.alive]
         for sp in self.sprites:
             sp.update()
@@ -245,17 +245,21 @@ class Display(object):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
                     GL_STENCIL_BUFFER_BIT)
         glLoadIdentity()
-        gluLookAt(*self.eyePos + self.centerPos + (0., 0., 1.))
+        #gluLookAt(*self.eyePos + self.centerPos + (0., 0., 1.))
 
         gw, gh = config.GRID_SIZE
         gt = (gw + gh)/2
         glTranslate(gw/2., gh/2., 0)
         glScale(gw, gh, gt)
+        camera.mul_view_matrix()
+
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
         
         #self.draw_shadow()
         self.draw_reflected(field)
         self.draw_sprites()
+
+        
         
 
         # draw lights

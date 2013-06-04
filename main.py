@@ -5,7 +5,9 @@ import display
 from display import Display
 from sprites import Goal, Lights
 from levels import Level, levels
+from camera import Camera
 import shapes
+
 
 clock = pygame.time.Clock()
 
@@ -66,6 +68,7 @@ class Game:
     def play(self, level):
         self.load_level(level)
         self.init_display()
+        self.camera = Camera(level.player.pos)
         display = self.display
         self._quit = False
         self._win = False
@@ -83,7 +86,13 @@ class Game:
                     key = event.key
                     if key == pygame.K_q:
                         self._quit = True
-                    newDir = config.Dirs.get(key, None)
+                    #camera view event demo
+                    elif key == pygame.K_1:
+                        self.camera.adjust(1)
+                    elif key == pygame.K_2:
+                        self.camera.adjust(-1)
+                    else:
+                        newDir = config.Dirs.get(key, None)
             # update logic
             if not self._ended and fcnt % config.DD == 0:
                 # update player pos
@@ -96,6 +105,7 @@ class Game:
                             break
                     else:
                         self.player.rest()
+                    self.camera.update(self.player.pos)
                 # recalculate lights
                 for emitter in self.emitters:
                     emitter.calculate(self.field)
@@ -111,7 +121,7 @@ class Game:
                     self.end_game(False)
             # update display
 
-            display.update(self.field)
+            display.update(self.field, self.camera)
             # tick
             timer.tick(config.FPS)
             clock.tick()
