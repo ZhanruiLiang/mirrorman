@@ -33,7 +33,9 @@ class Game:
         if item1:
             push = True
             if isinstance(item1, Goal):
+                player.move(direction)
                 self.end_game(True)
+                return
             if not item1.moveable:
                 canGo = False
             else:

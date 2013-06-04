@@ -64,11 +64,6 @@ class Object(object):
 
 
 class Model(object):
-    _models = {}
-    @staticmethod
-    def load(filepath):
-        return Model._models[filepath]
-
     def __iter__(self):
         for obj in self.objects.itervalues():
             yield obj

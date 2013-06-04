@@ -1,0 +1,12 @@
+# Blender MTL File: 'exit.blend'
+# Material Count: 1
+
+newmtl Material.001
+Ns 64.705882
+Ka 0.000000 0.000000 0.000000
+Kd 0.181987 0.185199 0.101542
+Ks 0.168248 0.171224 0.093732
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd wall.png

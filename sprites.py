@@ -5,7 +5,7 @@ from config import GRID_SIZE, FPS, DD, DPT, MIRROR_COLOR
 import config
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-from models import Model
+import objReader
 from animation import Animation, Animation2
 import shapes
 
@@ -66,7 +66,7 @@ class Item(Sprite):
         self.orient = orient
         self.restTime = None
         if self.modelName:
-            self.model = Model.load(self.modelName)
+            self.model = objReader.load(self.modelName)
         else:
             self.model = None
         self._pt = 0
@@ -261,7 +261,7 @@ class ObstacleCorner(Obstacle):
 
 class Goal(Obstacle):
     color = glcolor(0xff, 0, 0, 0xff)
-    modelName = None
+    modelName = 'exit.obj'
 
 class Lights(Sprite):
     curDisplace = .3

@@ -34,6 +34,7 @@ MODEL_SUBPATHS = [
         'mirror.obj',
         'wall.obj',
         'wall-corner.obj',
+        'exit.obj',
         'mirrorman/mirrorman.obj',
         'mirrorman/die/',
         'mirrorman/push/',

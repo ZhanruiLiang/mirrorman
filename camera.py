@@ -16,7 +16,7 @@ class Camera:
     stepT = .05
 
     # dir = eyePos - centerPos
-    dir = (0., -3., 2)
+    dir = (1., -5., 6)
 
     def __init__(self, field):
         self.field = field

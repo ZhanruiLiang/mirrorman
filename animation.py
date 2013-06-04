@@ -3,8 +3,8 @@ import re
 import ctypes
 import utils
 import config
-from models import Model
 from objReader import extract_num
+import objReader
 
 class Animation(object):
     """
@@ -69,7 +69,7 @@ class Animation2(Animation):
         self.frameModels = []
         cnt = 0
         for i, x in xs:
-            model = Model.load(os.path.join(aniFolder, x))
+            model = objReader.load(os.path.join(aniFolder, x))
             self.frameModels.append(model)
             cnt += 1
             if cnt == config.ANIMATION_CUT: break

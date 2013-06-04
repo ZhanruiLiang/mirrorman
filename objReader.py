@@ -169,6 +169,16 @@ def extract_num(filename):
     else:
         return None
 
+def load_single(filepath, data):
+    objects = data['objects']
+    mtllib = data['mtllib']
+    for mtl in mtllib:
+        mtl.convert()
+    model = Model(filepath)
+    for obj in objects.itervalues():
+        model.objects[obj.name] = Object(obj.name, obj.vdata, obj.material)
+    return model
+
 def make_dat():
     data = {}
     tm = Timer()
@@ -192,6 +202,8 @@ def make_dat():
     outf.close()
     print 'write {}, time: {}ms'.format(config.DAT_PATH, tm.tick())
 
+models = {}
+
 def load_models():
     tm = Timer()
     if config.GZIP_LEVEL is not None:
@@ -203,11 +215,12 @@ def load_models():
     infile.close()
     print 'load dat time: {}ms'.format(tm.tick())
     for filepath, data in modeldatas.iteritems():
-        objects = data['objects']
-        mtllib = data['mtllib']
-        for mtl in mtllib:
-            mtl.convert()
-        model = Model(filepath)
-        for obj in objects.itervalues():
-            model.objects[obj.name] = Object(obj.name, obj.vdata, obj.material)
-        Model._models[filepath] = model
+        models[filepath] = load_single(filepath, data)
+
+def load(filepath):
+    if filepath in models:
+        return models[filepath]
+    data = convert_model_data(filepath)
+    model = load_single(filepath, data)
+    models[filepath] = model
+    return model
