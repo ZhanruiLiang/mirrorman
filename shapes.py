@@ -18,6 +18,56 @@ def calculateNormal(vA, vB):
     vC = [i/factor for i in vC]
     return vC
 
+class CubeShape:
+    def __init__(self):
+        self.listID = glGenLists(1)
+
+        glNewList(self.listID, GL_COMPILE)
+
+        glBegin(GL_QUADS)
+        #front
+        glNormal3fv((1., .0, .0))
+        glVertex3fv((.5, -.5, -.5))
+        glVertex3fv((.5, .5, -.5))
+        glVertex3fv((.5, .5, .5))
+        glVertex3fv((.5, -.5, .5))
+        #left
+        glNormal3fv((0., -1., .0))
+        glVertex3fv((-.5, -.5, -.5))
+        glVertex3fv((-.5, -.5, .5))
+        glVertex3fv((.5, -.5, .5))
+        glVertex3fv((.5, -.5, -.5))
+        #back
+        glNormal3fv((-1., 0., 0.))
+        glVertex3fv((-.5, -.5, -.5))
+        glVertex3fv((-.5, .5, -.5))
+        glVertex3fv((-.5, .5, .5))
+        glVertex3fv((-.5, -.5, .5))
+        #right
+        glNormal3fv((1., 0., 0.))
+        glVertex3fv((.5, .5, -.5))
+        glVertex3fv((-.5, .5, -.5))
+        glVertex3fv((-.5, .5, .5))
+        glVertex3fv((.5, .5, .5))
+        #top
+        glNormal3fv((0., 0., 1.))
+        glVertex3fv((.5, -.5, .5))
+        glVertex3fv((-.5, -.5, .5))
+        glVertex3fv((-.5, .5, .5))
+        glVertex3fv((.5, .5, .5))
+        #down
+        glNormal3fv((0., 0., -1.))
+        glVertex3fv((.5, -.5, -.5))
+        glVertex3fv((-.5, -.5, -.5))
+        glVertex3fv((-.5, .5, -.5))
+        glVertex3fv((.5, .5, -.5))
+        glEnd()
+        glEndList()
+
+    def draw(self):
+        glCallList(self.listID)
+
+
 class cylindarShape:
     def __init__ (self):
         cylindarV = []

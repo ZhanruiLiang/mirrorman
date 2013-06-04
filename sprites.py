@@ -1,7 +1,8 @@
 import pygame
 import math
 import random
-from config import GRID_SIZE, FPS, DD, DPT, SINGLE_ANIMATION
+from config import GRID_SIZE, FPS, DD, DPT, SINGLE_ANIMATION,\
+    MIRROR_COLOR
 import config
 from OpenGL.GL import *
 from OpenGL.GLUT import *
@@ -12,6 +13,7 @@ import shapes
 __meta__ = type
 
 cylindar = shapes.cylindarShape()
+
 
 def alpha(color, a):
     if len(color) == 3:
@@ -175,35 +177,75 @@ class AnimatedItem(Item):
 class Mirror(Item):
     color = glcolor(168, 255, 235, 0xff)
     reflective = True
-    modelName = 'mirror.obj'
+    modelName = 'mirror.obj'#set this to your base obj
 
-    def draw1(self):
-        angle = math.degrees(math.atan2(self.orient[1], self.orient[0]))
+    def draw(self):
+        if self._pt > 0:
+            x1, y1 = self._nextPos
+            x0, y0 = self.pos
+            dx, dy = x1 - x0, y1 - y0
+            t = self._pt
+            glTranslated(dx * t, dy * t, 0)
+        ox, oy = self.orient
+        glRotated(math.degrees(math.atan2(oy, ox)), 0., 0., 1.)
 
-        # draw mirror base
-        self.setMaterial((.2,.0,.0,.5))
-        #glColor4f(0., 0., 0., 0.)
+        self.draw_base()
+        glEnable(GL_BLEND)
+        glDisable(GL_LIGHTING)
+        glBlendEquation(GL_FUNC_ADD)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        self.draw_mirror()
+        glDisable(GL_BLEND)
+        glEnable(GL_LIGHTING)
+
+
+    def draw_base(self):
+        #draw your model base here
+        glColor4fv((.8, .0, .0, 1.))
         glPushMatrix()
-        glTranslate(.0, .0, .1)
-        glScale(1., 1., .2)
+        glTranslate(0., 0., .1)
+        glScale(1., 1., .1)
         glutSolidCube(1)
         glPopMatrix()
-        # draw mirror
-        #glColor4fv(self.color)
-        if self.dying:
-            if self.restTime % 2:
-                color = self.color
-            else:
-                color = (.3, .2, .2, .2)
-        else:
-            color = self.color
-        self.setMaterial(color)
+
+    def draw_mirror(self):
+        glColor4fv(MIRROR_COLOR)
         glPushMatrix()
-        glTranslate(0, 0, .5)
-        glRotate(angle, 0, 0, 1)
-        glScale(0.1, 1, 1)
+        glTranslate(0., 0., .2)
+        #draw mirror
+        glTranslate(0., 0., 1.)
+        glScale(0.1, 1., 2.)
         glutSolidCube(1)
         glPopMatrix()
+
+
+    # def draw1(self):
+    #     angle = math.degrees(math.atan2(self.orient[1], self.orient[0]))
+
+    #     # draw mirror base
+    #     self.setMaterial((.2,.0,.0,.5))
+    #     #glColor4f(0., 0., 0., 0.)
+    #     glPushMatrix()
+    #     glTranslate(.0, .0, .1)
+    #     glScale(1., 1., .2)
+    #     glutSolidCube(1)
+    #     glPopMatrix()
+    #     # draw mirror
+    #     #glColor4fv(self.color)
+    #     if self.dying:
+    #         if self.restTime % 2:
+    #             color = self.color
+    #         else:
+    #             color = (.3, .2, .2, .2)
+    #     else:
+    #         color = self.color
+    #     self.setMaterial(color)
+    #     glPushMatrix()
+    #     glTranslate(0, 0, .5)
+    #     glRotate(angle, 0, 0, 1)
+    #     glScale(0.1, 1, 1)
+    #     glutSolidCube(1)
+    #     glPopMatrix()
 
 class Emitter(Item):
     color = glcolor(147, 17, 161, 0xff)
@@ -359,4 +401,3 @@ class Player(AnimatedItem):
 
     def is_ready(self):
         return self._pt == 0
-

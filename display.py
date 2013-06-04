@@ -1,7 +1,7 @@
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from OpenGL.GL import *
-from sprites import Lights, cylindar, Item
+from sprites import Lights, cylindar, Item, Mirror
 import config
 import pygame
 import math
@@ -56,6 +56,7 @@ class Display(object):
 
         self.sprites = []
         self.staticSprites = []
+
         self.reshape()
         self.init_shadow_matrix()
 
@@ -69,7 +70,7 @@ class Display(object):
             for obj in sp.model.objects.itervalues():
                 if obj not in objs: objs[obj] = []
                 objs[obj].append(sp)
-        print objs
+        #print objs
         self.staticDisplayListID = glGenLists(1)
         glNewList(self.staticDisplayListID, GL_COMPILE)
         for obj, sprites in objs.iteritems():
@@ -92,6 +93,7 @@ class Display(object):
                 glTranslate(x, y, 0)
                 glDrawElements(GL_TRIANGLES, n, GL_UNSIGNED_INT, obj.indices)
                 glPopMatrix()
+        glDisable(GL_TEXTURE_2D)
         glEndList()
 
     def reshape(self):
@@ -109,16 +111,26 @@ class Display(object):
     def draw_sprites(self):
         if self.staticDisplayListID is None:
             self.process_statics()
-        glCallList(self.staticDisplayListID)
+        mirrorList = []
 
         for sp in self.sprites:
+            if isinstance(sp, Mirror): mirrorList.append(sp)
+            else:
+                glPushMatrix()
+                x, y = sp.pos
+                glTranslate(x, y, 0)
+                sp.draw()
+                glPopMatrix()
+
+        glDisable(GL_TEXTURE_2D)
+        for mirror in mirrorList:
             glPushMatrix()
-
-            x, y = sp.pos
+            x, y = mirror.pos
             glTranslate(x, y, 0)
-            sp.draw()
-
+            mirror.draw()
             glPopMatrix()
+
+        glCallList(self.staticDisplayListID)
 
     def draw_reflected(self, field):
         glClearStencil(0)
@@ -149,6 +161,7 @@ class Display(object):
         glDisable(GL_LIGHTING)
         glBlendEquation(GL_FUNC_ADD)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glColor4fv((.1, .1, .1, .7))
         glPushMatrix()
         field.draw()
         glPopMatrix()
@@ -194,6 +207,7 @@ class Display(object):
         glPopMatrix()
 
         #draw shadow
+        glDisable(GL_TEXTURE_2D)
         glEnable(GL_STENCIL_TEST)
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
         glEnable(GL_DEPTH_TEST)
@@ -237,9 +251,10 @@ class Display(object):
         glScale(gw, gh, gt)
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
         
-        # self.draw_shadow()
-        self.draw_sprites()
+        #self.draw_shadow()
         self.draw_reflected(field)
+        self.draw_sprites()
+        
 
         # draw lights
         glPushMatrix()
