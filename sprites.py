@@ -214,7 +214,7 @@ class Emitter(Item):
         dx, dy = self.orient
         alive = True
         light = self.light = Light()
-        light.nodes.append((x, y))
+        light.nodes.append(self.cur_pos())
         vis = {((x, y), (dx, dy))}
         cnt = 0 
         item = None
@@ -238,9 +238,6 @@ class Emitter(Item):
             x, y = p1
         light.end = item
 
-class Goal(Item):
-    color = glcolor(0xff, 0, 0, 0xff)
-
 class Light:
     color = glcolor(0, 0x91, 0xe5, 0x88)
     def __init__(self):
@@ -260,9 +257,13 @@ class Obstacle(Item):
     def die(self):
         pass
 
+class Goal(Obstacle):
+    color = glcolor(0xff, 0, 0, 0xff)
+    modelName = None
+
 class Lights(Sprite):
     curDisplace = .5
-    curDetail = .05
+    curDetail = .10
     curNum = 2
     def __init__(self):
         super(Lights, self).__init__()

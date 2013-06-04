@@ -104,7 +104,7 @@ class Game:
                         end.die()
                 self.emitters = [x for x in self.emitters if x.alive]
                 self.lights.redraw(self.emitters)
-                for sp in display:
+                for sp in display.sprites:
                     if hasattr(sp, 'update2'):
                         sp.update2()
                 if self.player.dying:
@@ -119,4 +119,4 @@ class Game:
             fcnt += 1
 
 game = Game()
-game.play(levels[1]())
+game.play(levels[-1]())

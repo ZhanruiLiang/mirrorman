@@ -3,10 +3,10 @@ import os
 
 GRID_SIZE = 80, 80
 SCREEN_SIZE = 1000, 700
-FPS = 30
+FPS = 60
 DD = 3
 SINGLE_ANIMATION = 0
-DPT = 0.2
+DPT = 0.1
 
 Dirs = {
     pygame.K_LEFT: (-1, 0),

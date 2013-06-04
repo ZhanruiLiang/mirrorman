@@ -8,13 +8,20 @@ import utils
 
 baseDir = "models"
 
+_objID = 0
 class Object(object):
     def __init__(self, name):
+        global _objID
+        self.objID = _objID
+        _objID += 1
         self.name = name
         self.indices = []
         self.vdata = [] # GL_T2F_N3F_V3F
         self.material = None
         self.aniMat = utils.eye_glmat4()
+
+    def __hash__(self):
+        return hash(self.objID)
 
     def convert(self):
         self.indices = utils.convert_ctypes(

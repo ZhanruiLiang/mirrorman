@@ -55,8 +55,44 @@ class Display(object):
         self.lightPos = (-50.,-50., 150,  1.)
 
         self.sprites = []
+        self.staticSprites = []
         self.reshape()
-        self.initShadowMatrix()
+        self.init_shadow_matrix()
+
+        self.staticDisplayListID = None
+
+    def process_statics(self):
+        # sprite in objs[sprite.model.objects[i]]
+        objs = {} 
+        for sp in self.staticSprites:
+            if not sp.model: continue # dummay
+            for obj in sp.model.objects.itervalues():
+                if obj not in objs: objs[obj] = []
+                objs[obj].append(sp)
+        print objs
+        self.staticDisplayListID = glGenLists(1)
+        glNewList(self.staticDisplayListID, GL_COMPILE)
+        for obj, sprites in objs.iteritems():
+            material = obj.material
+            if material:
+                glEnable(GL_TEXTURE_2D)
+                glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+                
+                glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient)
+                glMaterialfv(GL_FRONT, GL_DIFFUSE, material.diffuse)
+                glMaterialfv(GL_FRONT, GL_SPECULAR, material.specular)
+                glMaterialfv(GL_FRONT, GL_SHININESS, material.shininess)
+                glBindTexture(GL_TEXTURE_2D, material.texid)
+            else: glDisable(GL_TEXTURE_2D)
+            glInterleavedArrays(GL_T2F_N3F_V3F, 0, obj.vdata)
+            n = len(obj.indices)
+            for sp in sprites:
+                glPushMatrix()
+                x, y = sp.pos
+                glTranslate(x, y, 0)
+                glDrawElements(GL_TRIANGLES, n, GL_UNSIGNED_INT, obj.indices)
+                glPopMatrix()
+        glEndList()
 
     def reshape(self):
         w, h = self.size
@@ -70,7 +106,11 @@ class Display(object):
         self.eyePos = (w * .5, (-0.1) * h, h*(1.0))
         self.centerPos = (w/2., h/2., 0.)
 
-    def drawSprites(self):
+    def draw_sprites(self):
+        if self.staticDisplayListID is None:
+            self.process_statics()
+        glCallList(self.staticDisplayListID)
+
         for sp in self.sprites:
             glPushMatrix()
 
@@ -80,7 +120,7 @@ class Display(object):
 
             glPopMatrix()
 
-    def drawReflectedSpritesAndField(self, field):
+    def draw_reflected(self, field):
         glClearStencil(0)
         glDisable(GL_DEPTH_TEST)
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE)
@@ -98,7 +138,7 @@ class Display(object):
         glPushMatrix()
         glScalef(1.0, 1.0, -1.0)
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
-        self.drawSprites()
+        self.draw_sprites()
         glDisable(GL_NORMALIZE)
         glPopMatrix()
 
@@ -115,7 +155,7 @@ class Display(object):
         glDisable(GL_BLEND)
         glEnable(GL_LIGHTING)
 
-    def initShadowMatrix(self):
+    def init_shadow_matrix(self):
         l = list(self.lightPos)
         factor = math.sqrt(l[0]**2 + l[1]**2 + l[2]**2)
         l[0] /= factor
@@ -131,7 +171,7 @@ class Display(object):
         self.shadowMat = utils.convert_ctypes(
             shadowMat, ctypes.c_float, (len(shadowMat), ))
 
-    def drawShadow(self):
+    def draw_shadow(self):
         #draw shadow stencil
         glClearStencil(0)
         glDisable(GL_DEPTH_TEST)
@@ -172,8 +212,10 @@ class Display(object):
     def add(self, sp):
         if isinstance(sp, Lights):
             self.lights = sp
-        else:
+        elif sp.moveable:
             self.sprites.append(sp)
+        else:
+            self.staticSprites.append(sp)
 
     def hint(self, text):
         print text
@@ -195,9 +237,9 @@ class Display(object):
         glScale(gw, gh, gt)
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
         
-        # self.drawShadow()
-        self.drawSprites()
-        self.drawReflectedSpritesAndField(field)
+        # self.draw_shadow()
+        self.draw_sprites()
+        self.draw_reflected(field)
 
         # draw lights
         glPushMatrix()
@@ -213,8 +255,3 @@ class Display(object):
         #glPopMatrix()
 
         pygame.display.flip()
-        
-    def __iter__(self):
-        return iter(self.sprites)
-
-

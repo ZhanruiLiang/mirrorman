@@ -187,7 +187,29 @@ class Level_test_2(Level):
 
         self.collect()
 
+class Level_test_3(Level):
+    def __init__(self):
+        Level.__init__(self, 'test level 3', (20, 20))
+        A = self.add
+
+        A(Player(pos=(10, 2)))
+        A(Emitter(pos=(5, 15), orient=(-1, 0)))
+        A(Emitter(pos=(15, 15), orient=(0, 1)))
+        A(Emitter(pos=(15, 5), orient=(1, 0)))
+        A(Emitter(pos=(5, 5), orient=(0, -1)))
+        # A(Obstacle(pos=(6, 1)))
+        # A(Mirror(pos=(4, 3), orient=(0, 1)))
+        A(Mirror(pos=(3, 15), orient=(1, 1)))
+        A(Mirror(pos=(15, 18), orient=(1, -1)))
+        A(Mirror(pos=(18, 5), orient=(-1, -1)))
+        A(Mirror(pos=(5, 3), orient=(-1, 1)))
+
+        A(Goal(pos=(5, 0), orient=(0, 1)))
+
+        self.collect()
+
 levels = [
     Level_test,
     Level_test_2,
+    Level_test_3
 ]
