@@ -1,4 +1,4 @@
-folders="rest push walk"
+folders="rest push walk die"
 for folder in $folders
 do
     cd $folder
