@@ -3,7 +3,7 @@ import os
 
 GRID_SIZE = 80, 80
 SCREEN_SIZE = 1000, 700
-FPS = 60
+FPS = 40
 DD = 3
 # ANIMATION_CUT = 5
 ANIMATION_CUT = None

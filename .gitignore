@@ -6,4 +6,5 @@ __pycache__/
 *.blend2
 models/sintel
 models/console_ani
+models/models.dat
 backup

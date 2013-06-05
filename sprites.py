@@ -265,7 +265,7 @@ class Goal(Obstacle):
 
 class Lights(Sprite):
     curDisplace = .3
-    curDetail = .01
+    curDetail = .02
     curNum = 2
     curRedColor = 1.
     curRedColorIsAdd = False
@@ -276,7 +276,8 @@ class Lights(Sprite):
         super(Lights, self).__init__()
 
     def drawLighting(self, p1, p2, displace, L):
-        if L < self.curLength or displace < self.curDetail:
+        if L < self.curLength and displace < self.curDetail:
+        # if L < self.curLength:
             self.nodes.append(p1)
             self.nodes.append(p2)
         else:
@@ -300,13 +301,14 @@ class Lights(Sprite):
 
         glEnable(GL_BLEND)
         # glColor4fv((self.curRedColor, 0., 0., 1.))
-        glColor4fv((0., self.curRedColor, 0., 1.))
+        c = self.curRedColor
+        glColor4f(c, c, c, 1.)
         glLineWidth(1)
         height = 1.5
         for light in self.lights:
             for j in xrange(0, self.curNum):
                 self.nodes = []
-                #glColor4fv(light.color)
+                #glColor4f(*light.color)
                 for i in xrange(0, len(light.nodes) - 1):
                     dx = light.nodes[i+1][0] - light.nodes[i][0]
                     dy = light.nodes[i+1][1] - light.nodes[i][1]

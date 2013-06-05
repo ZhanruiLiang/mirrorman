@@ -9,7 +9,7 @@ if '-m' in sys.argv[1:]:
 import pygame
 import config
 import display
-from display import Display
+from display import Display, MenuDisplay
 from sprites import Goal, Lights
 from levels import Level, levels
 from camera import Camera
@@ -24,6 +24,31 @@ display.init()
 objReader.load_models()
 
 class Game:
+    def menu(self):
+        items = [(level.name, lambda x=level: self.play(x())) for level in levels
+            ] + [('quit', lambda: exit(0))]
+
+        menu = MenuDisplay(items)
+        self._quitMenu = False
+
+        tm = pygame.time.Clock()
+        while not self._quitMenu:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit(0)
+                elif event.type == pygame.KEYDOWN:
+                    key = event.key
+                    if key == pygame.K_q:
+                        exit(0)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        menu.click(event.pos)
+                        self._quitMenu = True
+                elif event.type == pygame.MOUSEMOTION:
+                    menu.select(event.pos)
+            menu.update()
+            tm.tick(config.FPS)
+
     def move_player(self, player, direction):
         x0, y0 = player.pos
         x, y = move(player.pos, direction)
@@ -135,4 +160,5 @@ class Game:
             fcnt += 1
 
 game = Game()
-game.play(levels[5]())
+while 1:
+    game.menu()

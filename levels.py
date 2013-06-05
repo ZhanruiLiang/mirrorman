@@ -136,6 +136,7 @@ class Level:
     player: Player
     field: Field
     """
+    name = 'abstract level'
     def __init__(self, name, fieldSize):
         self.name = name
         self.emitters = []
@@ -157,22 +158,8 @@ class Level:
             self.field.remove_sprite_at(sp.pos)
         self.field.add_sprite(sp)
 
-class Level_test(Level):
-    def __init__(self):
-        Level.__init__(self, 'test level', (12, 10))
-        A = self.add
-
-        A(Player(pos=(4, 4)))
-        A(Bomb(pos=(5, 4)))
-        A(Emitter(pos=(6, 4)))
-        A(Emitter(pos=(6, 5)))
-        A(Mirror(pos=(6, 6)))
-        A(Mirror(pos=(8, 8), orient=(-1, -1)))
-        A(Mirror(pos=(8, 4), orient=(-1, 1)))
-
-        self.collect()
-
 class Level_test_2(Level):
+    name = 'test level 2'
     def __init__(self):
         Level.__init__(self, 'test level 2', (12, 11))
         A = self.add
@@ -192,6 +179,7 @@ class Level_test_2(Level):
         self.collect()
 
 class Level_test_3(Level):
+    name = 'test level 3'
     def __init__(self):
         Level.__init__(self, 'test level 3', (20, 20))
         A = self.add
@@ -213,6 +201,7 @@ class Level_test_3(Level):
         self.collect()
 
 class Level_test_4(Level):
+    name = 'test level 4'
     def __init__(self):
         Level.__init__(self, 'test level 4', (9, 9))
         A = self.add
@@ -234,6 +223,7 @@ class Level_test_4(Level):
         self.collect()
 
 class Level_test_5(Level):
+    name = 'test level 5'
     def __init__(self):
         Level.__init__(self, 'test level 5', (7, 10))
         A = self.add
@@ -253,6 +243,7 @@ class Level_test_5(Level):
         self.collect()
 
 class Level_test_6(Level):
+    name = 'test level 6'
     def __init__(self):
         Level.__init__(self, 'test level 6', (14, 10))
         A = self.add
@@ -277,7 +268,6 @@ class Level_test_6(Level):
         self.collect()
 
 levels = [
-    Level_test,
     Level_test_2,
     Level_test_3,
     Level_test_4,

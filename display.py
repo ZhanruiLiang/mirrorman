@@ -49,6 +49,87 @@ class Hint(pygame.sprite.Sprite):
     def __init__(self, rect, text):
         pass
 
+class MenuDisplay(object):
+    BG_COLOR = (.3, .3, .3, 1.)
+    BTN_COLOR = (.8, .8, .8, 1.)
+    SELECTED_COLOR = (.9, .9, .5, 1.)
+    FONT_COLOR = (.1, .1, .1, 1.)
+
+    def __init__(self, menuItems):
+        self.size = config.SCREEN_SIZE
+        w, h = self.size
+        self.items = menuItems
+        self.selected = None
+        self.reshape()
+
+    def reshape(self):
+        w, h = self.size
+        glViewport(0, 0, w, h)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluOrtho2D(0, 1, 0, 1)
+
+        glMatrixMode(GL_MODELVIEW)
+
+        glDisable(GL_DEPTH_TEST)
+        glDisable(GL_TEXTURE_2D)
+        glDisable(GL_LIGHTING)
+
+        glClearColor(*self.BG_COLOR)
+
+    def update(self):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        # glDisable(GL_LIGHTING)
+        # glDisable(GL_TEXTURE_2D)
+
+        glLoadIdentity()
+
+        for rect, item in self.rect_items():
+            if item is self.selected:
+                glColor4d(*self.SELECTED_COLOR)
+            else:
+                glColor4d(*self.BTN_COLOR)
+            glBegin(GL_QUADS)
+            x1, y1, x2, y2 = rect
+            glVertex2d(x1, y1)
+            glVertex2d(x2, y1)
+            glVertex2d(x2, y2)
+            glVertex2d(x1, y2)
+            glEnd()
+
+            #TODO
+            glRasterPos3f (x1, y1, 1);
+            glutBitmapString(GLUT_BITMAP_HELVETICA_18, item[0]);
+
+        pygame.display.flip()
+
+    def rect_items(self):
+        x, y = x0, y0 = 0.2, 0.95
+        blockW, blockH = 0.6, 0.1
+        sep = 0.04
+        for item in self.items:
+            rect = (x, y - blockH, x + blockW, y)
+            yield rect, item
+            x, y = x, y - blockH - sep
+
+    def _convert_pos(self, screenPos):
+        x, y = screenPos
+        w, h = map(float, self.size)
+        return x / w, (h - y) / h
+
+    def select(self, pos):
+        x, y = self._convert_pos(pos)
+        self.selected = None
+        for rect, item in self.rect_items():
+            if rect[0] <= x <= rect[2] and rect[1] <= y <= rect[3]:
+                self.selected = item
+                break
+
+    def click(self, pos):
+        self.select(pos)
+        name, func = self.selected
+        func()
+
 class Display(object):
     def __init__(self):
         self.size = config.SCREEN_SIZE
@@ -266,9 +347,6 @@ class Display(object):
         #self.draw_shadow(field)
         self.draw_reflected(field)
         self.draw_sprites()
-
-        
-        
 
         # draw lights
         glPushMatrix()

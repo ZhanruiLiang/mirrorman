@@ -32,14 +32,16 @@ class Object(object):
         resetLight = False
         if material: 
             glEnable(GL_TEXTURE_2D)
-            # if material.alpha < 1-1e-8:
-            #     glEnable(GL_BLEND)
-            #     glDisable(GL_LIGHTING)
-            #     resetLight = True
-            #     glBlendEquation(GL_FUNC_ADD)
-            #     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-            #     d = material.diffuse
-            #     glColor4f(d[0], d[1], d[2], material.alpha)
+            if material.alpha < 1-1e-8:
+                glDisable(GL_LIGHTING)
+                glDisable(GL_TEXTURE_2D)
+                glEnable(GL_BLEND)
+                resetLight = True
+                # glBlendEquation(GL_FUNC_ADD)
+                glBlendEquation(GL_MAX)
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                d = material.diffuse
+                glColor4f(d[0], d[1], d[2], material.alpha)
             glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
             
             glMaterialfv(GL_FRONT, GL_AMBIENT, material.ambient)
@@ -57,7 +59,7 @@ class Object(object):
         glDrawElements(GL_TRIANGLES, len(self.indices),
                        GL_UNSIGNED_INT, self.indices)
         glPopMatrix()
-        # glDisable(GL_BLEND)
+        glDisable(GL_BLEND)
         glDisable(GL_TEXTURE_2D)
         if resetLight:
             glEnable(GL_LIGHTING)
