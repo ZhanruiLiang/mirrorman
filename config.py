@@ -2,7 +2,7 @@ import pygame
 import os
 
 GRID_SIZE = 80, 80
-SCREEN_SIZE = 1000, 700
+SCREEN_SIZE = 1368, 768
 FPS = 60
 DD = 3
 # ANIMATION_CUT = 5
