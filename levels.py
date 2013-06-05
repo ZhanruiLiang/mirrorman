@@ -212,8 +212,75 @@ class Level_test_3(Level):
 
         self.collect()
 
+class Level_test_4(Level):
+    def __init__(self):
+        Level.__init__(self, 'test level 4', (9, 9))
+        A = self.add
+        A(Player(pos=(5,4)))
+        A(Emitter(pos=(7, 7), orient=(0, -1)))
+
+        A(Mirror(pos=(7, 1), orient=(-1, 1)))
+        A(Mirror(pos=(1, 1), orient=(1, 1)))
+        A(Mirror(pos=(1, 7), orient=(1, -1)))
+        A(Mirror(pos=(6, 7), orient=(-1, -1)))
+        A(Mirror(pos=(6, 2), orient=(-1, 1)))
+        A(Mirror(pos=(2, 2), orient=(1, 1)))
+        A(Mirror(pos=(2, 4), orient=(1, -1)))
+        A(Mirror(pos=(4, 4), orient=(1, -1)))
+
+        A(Mirror(pos=(4, 5), orient=(1, -1)))
+
+        A(Goal(pos=(0, 3), orient=(-1, 0)))
+        self.collect()
+
+class Level_test_5(Level):
+    def __init__(self):
+        Level.__init__(self, 'test level 5', (7, 10))
+        A = self.add
+        A(Emitter(pos=(1, 6), orient=(0, -1)))
+        A(Emitter(pos=(2, 7), orient=(0, -1)))
+        A(Emitter(pos=(3, 6), orient=(0, -1)))
+        A(Emitter(pos=(4, 5), orient=(0, -1)))
+
+        A(Mirror(pos=(1, 3), orient=(1, 1)))
+        A(Mirror(pos=(2, 4), orient=(-1, 1)))
+        A(Mirror(pos=(3, 3), orient=(1, 1)))
+        A(Mirror(pos=(4, 2), orient=(1, 1)))
+
+        A(Player(pos=(1, 1)))
+        A(Goal(pos=(6, 2), orient=(1, 0)))
+
+        self.collect()
+
+class Level_test_6(Level):
+    def __init__(self):
+        Level.__init__(self, 'test level 6', (14, 10))
+        A = self.add
+        A(Player(pos=(5, 1)))
+
+        A(Emitter(pos=(5, 8), orient=(1, 0)))
+        
+        A(Mirror(pos=(8, 5), orient=(-1, 1)))
+        A(Mirror(pos=(9, 4), orient=(-1, 1)))
+        A(Mirror(pos=(3, 5), orient=(1, -1)))
+        A(Mirror(pos=(3, 3), orient=(1, 1)))
+        A(Mirror(pos=(11, 3), orient=(-1, -1)))
+        A(Mirror(pos=(11, 2), orient=(-1, 1)))
+        A(Mirror(pos=(2, 2), orient=(1, -1)))
+        A(Mirror(pos=(8, 6), orient=(-1, -1)))
+        A(Mirror(pos=(4, 6), orient=(1, 1)))
+        A(Mirror(pos=(4, 7), orient=(1, -1)))
+        A(Mirror(pos=(7, 7), orient=(-1, 1)))
+        A(Mirror(pos=(7, 8), orient=(-1, -1)))
+        A(Goal(pos=(6, 9), orient=(0, 1)))
+
+        self.collect()
+
 levels = [
     Level_test,
     Level_test_2,
-    # Level_test_3,
+    Level_test_3,
+    Level_test_4,
+    Level_test_5,
+    Level_test_6
 ]
