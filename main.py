@@ -72,12 +72,13 @@ class Game:
         self._ended = True
         self._win = win
         if win:
-            self.display.hint('You win. Press q to quit.')
+            self.display.hint('You win. Pres n to next level.')
+            self.display.hint('Press q to quit.')
         else:
             self.display.hint('You were killed by ray, press q to quit')
 
-    def play(self, level):
-        self.load_level(level)
+    def play(self, levels):
+        self.load_level(levels[1]())
         self.init_display()
         display = self.display
         self._quit = False
@@ -135,4 +136,4 @@ class Game:
             fcnt += 1
 
 game = Game()
-game.play(levels[5]())
+game.play(levels)
