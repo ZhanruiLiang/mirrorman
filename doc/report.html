@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>计算机图形学小组project报告</title>
+<style type="text/css">
+.body       { width: 940px; margin: auto; }
+.title      { color: #333; }
+.team       { font-size: 12pt; color: #5a5a5a; border-bottom: 2px solid; }
+.center     { text-align: center; }
+.subtitle   { text-align: center; font-size: 18pt; color: #d14; border-bottom: 2px solid #d14; }
+.keyword    { font-size: 12pt; color: #08c; }
+</style>
+</head>
+
+<body>
+<div class="body">
+<h2 class="center title">计算机图形学</h2>
+<h3 class="center title">小组project报告</h2>
+<div class="part1">
+    <p class="center team"> 
+    小组成员：
+    李冠贤  10389043
+    梁展瑞  10389084
+    陈侨安  10389223
+    李子然  10389041
+    </p>
+    <p>程序使用：</p>
+    <ul>
+        <li>1) 环境：linux，python2.7+, pyopengl，pygame。</li>
+        <li>2) 源码：都在mirrorman文件目录下。亦可到git@github.com:ZhanruiLiang/mirrorman.git上clone下来。</li>
+        <li>3) 附加模块：由于引入了ftgl字体模块，所以需要先安装ftgl-dev（ubuntu下：$ apt-get install ftgl-dev），在到http://code.google.com/p/pyftgl/downloads/list上下载pyftgl，安装（$ sudo python setup.py install）后即可。</li>
+        <li>3) 编译压缩模块: 进入到主目录后，$ python main.py -m</li>
+        <li>4) 运行：进入到主目录后，$ python main.py</li>
+    </ul>
+    <p>贡献列表：@todo</p>
+    <table width="100%" border="1" cellspacing="0" cellpadding="0">
+      <tr>
+        <th>姓名</th>
+        <th>学号</th>
+        <th>个人贡献列表</th>
+        <th>个人贡献百分比</th>
+      </tr>
+      <tr>
+        <td class="center">李冠贤</td>
+        <td class="center">10389043</td>
+        <td class="center">组长、文档、sprites模块</td>
+        <td class="center">25.8%</td>
+      </tr>
+      <tr>
+        <td class="center">陈侨安</td>
+        <td class="center">10389223</td>
+        <td class="center">模块</td>
+        <td class="center">26.8%</td>
+      </tr>
+      <tr>
+        <td class="center">梁展瑞</td>
+        <td class="center">10389084</td>
+        <td class="center">模块</td>
+        <td class="center">27.2%</td>
+      </tr>
+      <tr>
+        <td class="center">李子然</td>
+        <td class="center">10389041</td>
+        <td class="center">objreader模块</td>
+        <td class="center">21.2%</td>
+      </tr>
+     </table> 
+</div>
+<div class="part2">
+    <h5 class="subtitle"> [关键技术] </h5>
+    <p>for example: @todo</p>
+    <p><strong>模拟电流生成：</strong></p>
+    <p>关键算法：</br>
+        利用递归思想，在两点之间取直线中点，其坐标x、y分别加上一个由参数控制的随机数，也就是取一个一定范围内的点，再由这个点和原来的端点分别以这种方式向下递归，终止条件由另一参数控制，最后不断刷新就能产生电流效果。</p>
+    <pre><code>
+        def drawLightning(p1, p2, displace):
+            if displace < curDetail:
+                glBegin(GL_LINES)
+                glVertex2f(*p1)
+                glVertex2f(*p2)
+                glEnd()
+            else:
+                midx = (p1[0] + p2[0]) / 2
+                midy = (p1[1] + p2[1]) / 2
+                midx += (random.random() - .5) * displace
+                midy += (random.random() - .5) * displace
+                drawLightning(p1, (midx, midy), displace/2)
+                drawLightning(p2, (midx, midy), displace/2)
+    </code></pre>
+</div>
+<div class="part3">
+    <h5 class="subtitle"> [运行截图] </h5>
+</div>
+<div class="part4">
+    <h5 class="subtitle"> [总结] </h5>
+</div>
+</div>
+</body>
+</html>
