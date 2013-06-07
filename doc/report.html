@@ -5,18 +5,29 @@
 <title>计算机图形学小组project报告</title>
 <style type="text/css">
 .body       { width: 940px; margin: auto; }
-.title      { color: #333; }
+.title      { color: #333; font-size: 30pt;}
 .team       { font-size: 12pt; color: #5a5a5a; border-bottom: 2px solid; }
 .center     { text-align: center; }
-.subtitle   { text-align: center; font-size: 18pt; color: #d14; border-bottom: 2px solid #d14; }
+h5, .subtitle   { text-align: center; font-size: 18pt; color: #414; border-bottom: 5px solid #414; }
+h6 { font-size: 14pt; color: #d14; border-bottom: 1px solid #d14; }
 .keyword    { font-size: 12pt; color: #08c; }
+.figure { margin-bottom: 50px; }
+.tech>li {
+    font-size: 150%;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 2px 2px 8px 3px rgba(0, 100, 200, .5);
+    padding: 10px;
+    margin: 10px;
+    list-style: none;
+}
+div.TODO { color: red; font-weight: bold; background-color:#f95; font-size: 50px; }
 </style>
 </head>
 
 <body>
 <div class="body">
-<h2 class="center title">计算机图形学</h2>
-<h3 class="center title">小组project报告</h2>
+<h1 class="center title">计算机图形学小组project报告</h2>
 <div class="part1">
     <p class="center team"> 
     小组成员：
@@ -26,14 +37,15 @@
     李子然  10389041
     </p>
     <p>程序使用：</p>
-    <ul>
-        <li>1) 环境：linux，python2.7+, pyopengl，pygame。</li>
-        <li>2) 源码：都在mirrorman文件目录下。亦可到git@github.com:ZhanruiLiang/mirrorman.git上clone下来。</li>
-        <li>3) 附加模块：由于引入了ftgl字体模块，所以需要先安装ftgl-dev（ubuntu下：$ apt-get install ftgl-dev），在到http://code.google.com/p/pyftgl/downloads/list上下载pyftgl，安装（$ sudo python setup.py install）后即可。</li>
-        <li>3) 编译压缩模块: 进入到主目录后，$ python main.py -m</li>
-        <li>4) 运行：进入到主目录后，$ python main.py</li>
-    </ul>
-    <p>贡献列表：@todo</p>
+    <ol>
+        <li>环境：linux，python2.7+, pyopengl，pygame。</li>
+        <li>源代码：mirrorman目录下的所有py文件。可到<a href="git@github.com:ZhanruiLiang/mirrorman.git">github</a>上clone下来。</li>
+        <li>依赖：由于引入了ftgl字体模块，所以需要先安装ftgl-dev（ubuntu下：$ apt-get install ftgl-dev），在到http://code.google.com/p/pyftgl/downloads/list上下载pyftgl，安装（$ sudo python setup.py install）后即可。</li>
+        <li>编译压缩模块: 进入到主目录后，$ python main.py -m</li>
+        <li>运行：进入到主目录后，$ python main.py</li>
+        <li>联系方式: ray040123@gmail.com</li>
+    </ol>
+    <p>贡献列表：</p>
     <table width="100%" border="1" cellspacing="0" cellpadding="0">
       <tr>
         <th>姓名</th>
@@ -50,28 +62,44 @@
       <tr>
         <td class="center">陈侨安</td>
         <td class="center">10389223</td>
-        <td class="center">模块</td>
+        <td class="center">camara, display, levels, shapes模块</td>
         <td class="center">26.8%</td>
       </tr>
       <tr>
         <td class="center">梁展瑞</td>
         <td class="center">10389084</td>
-        <td class="center">模块</td>
+        <td class="center">animation, config, main, utils模块, 模型制作</td>
         <td class="center">27.2%</td>
       </tr>
       <tr>
         <td class="center">李子然</td>
         <td class="center">10389041</td>
-        <td class="center">objreader模块</td>
+        <td class="center">objreader, models模块</td>
         <td class="center">21.2%</td>
       </tr>
      </table> 
 </div>
+<div>
+    <h5 class="subtitle">[所用OpenGL技术]</h5>
+    <p>
+    <ul class="tech">
+        <li>Depth Test </li>
+        <li>Texture 2D</li>
+        <li>Lighting</li>
+        <li>Vertex Array</li>
+        <li>Display list</li>
+        <li>Blending</li>
+        <li>Stencil buffer</li>
+        <li>Interleave Array</li>
+        <li>Reflect Effect</li>
+        <li>Shadow Effect</li>
+    </ul>
+    </p>
+</div>
 <div class="part2">
     <h5 class="subtitle"> [关键技术] </h5>
-    <p>for example: @todo</p>
-    <p><strong>模拟电流生成：</strong></p>
-    <p>关键算法：</br>
+    <h6>模拟电流生成</h6>
+    <p>关键算法：<br/>
         利用递归思想，在两点之间取直线中点，其坐标x、y分别加上一个由参数控制的随机数，也就是取一个一定范围内的点，再由这个点和原来的端点分别以这种方式向下递归，终止条件由另一参数控制，最后不断刷新就能产生电流效果。</p>
     <pre><code>
         def drawLightning(p1, p2, displace):
@@ -88,6 +116,131 @@
                 drawLightning(p1, (midx, midy), displace/2)
                 drawLightning(p2, (midx, midy), displace/2)
     </code></pre>
+
+    <div>
+        <h6>obj模型导入</h6>
+        <div class="TODO">TODO</div>
+    </div>
+    <div>
+        <h6>渲染速度优化：改变渲染顺序</h6>
+        <p>
+        通过Profile发现，切换材质会消耗比较多的时间，所以可以通过把同样材质
+        的图元放在一起绘制，这就可以减少材质的切换，提高允许效率。
+
+        具体实现时，每个模型有若干部分组成，每部分称为一个Object，每个Object有一个
+        material成员，所以在渲染时可以先对所有Object已material做桶排序后渲染。
+        </p>
+    </div>
+    <div>
+        <h6>渲染速度优化：静态精灵使用显示列表</h6>
+        <p>
+        OpenGL的显示列表可以减少程序与OpenGL的通讯，提高速度。显示列表其实就是
+        将多条指令预先编译。这正好可以用来优化场景静态对象的渲染，因为它们是静态的，
+        位置和属性都不会变化，可以预先编译成显示列表。以后要画的时候调用一条OpenGL
+        指令即可。场景中大部分的物体都是静态的，这个优化会带来很大的性能提升。
+        </p>
+    </div>
+    <div>
+        <h6>模型动画的实现</h6>
+        <p>
+        考虑平面动画的实现，其实是每一帧一个图片，然后连续播放。3D动画也可以这样
+        实现，每一帧一个模型。这会带来一个问题，就是空间问题，模型所占储存空间太大了。
+        读取速度慢，渲染速度也慢。渲染速度慢可以用顶点数组来解决，具体在相关的小节会解释。
+        读取速度方面，解决的办法是对模型obj文件格式进行转化，然后压缩。转化的格式是与
+        OpenGL的InterleavedArray T2F_N3F_V3F 相同的排布，利用Python cPickle进行序列化。
+        然后用gzip压缩。这个转化只需要做一次，然后储存下来，以后启动时读取转化后的文件。
+        实际结果是，通过这个技术，时间效率提高了8倍（从8000ms到1000ms），空间效率上，将
+        将近100mb的模型压缩到了17mb. 整个程序的启动速度大约是3秒。
+        </p>
+    </div>
+    <div>
+        <h6>模型制作</h6>
+        <p>模型的制作工作是在著名的开源3D工具Blender下完成的。其中包括
+        <ul>
+            <li>模型的建模</li>
+            <li>纹理坐标映射</li>
+            <li>纹理贴图的绘制</li>
+            <li>材质的设定</li>
+            <li>动画骨骼的制作</li>
+            <li>模型与骨骼的绑定</li>
+            <li>动画动作的制作</li>
+            <li>动画模型的导出</li>
+        </ul>
+        </p>
+        <p>
+        Blender截图：
+        <div class="figure">
+            <img src="blender-1.png" alt="" width="800px"/>
+        </div>
+        <div class="figure">
+            <img src="blender-2.png" alt="" width="800px"/>
+        </div>
+        <div class="figure">
+            <img src="blender-3.png" alt="" width="800px"/>
+        </div>
+        </p>
+    </div>
+    <div>
+        <h6>渲染速度优化：使用顶点数组配合InterleavedArray</h6>
+        <div class="TODO">TODO</div>
+    </div>
+    <div>
+        <h6>同时开启材质和光照</h6>
+        <div class="TODO">TODO</div>
+        <p></p>
+    </div>
+    <div>
+        <h6>半透明效果</h6>
+        <div class="TODO">TODO</div>
+        <p></p>
+    </div>
+    <div>
+        <h6>反射效果</h6>
+        <div class="TODO">TODO</div>
+        <p></p>
+    </div>
+    <div>
+        <h6>阴影效果</h6>
+        <div class="TODO">TODO</div>
+        <p></p>
+    </div>
+    <div>
+        <h6>场景摄像机平滑运动</h6>
+        <p>
+        通过创建Camera类，实现对视点切换的更精细控制。为摄像机设定转移目标
+        时，可以根据起始点和目的地和当前时间对运动进行插值，计算出当前视点的位置。
+        实现平滑运动的效果。
+        </p>
+        <p>
+        <pre>
+        当前位置 curEyePos
+        目标位置 nextEyePos
+        迭代步长 dt
+
+        curEyePos' = curEyePos + dt * (nextEyePos - curEyePos)
+        </pre>
+        </p>
+    </div>
+    <div>
+        <h6>程序性能瓶颈检测</h6>
+        <p> 在开发过程中，如果加入新内容时发现程序帧率降低，可以通过Profile的手段
+        找出性能瓶颈。在Python中， 可以通过cProfile模块得到profile数据，然后用
+        runsnakerun 来进行可视化。效果非常好，很多重大性能优化都来源与此。
+        </p>
+        <p>
+        runsnakerun的可视化效果： 
+        <div class="figure">
+            <img src="runsnake-1.png" width="900px" alt="" />
+            asArray成为性能瓶颈
+            <hr />
+        </div>
+        <div class="figure">
+            <img src="runsnake-2.png" width="900px" alt="" />
+            drawLighting成为性能瓶颈
+            <hr />
+        </div>
+        </p>
+    </div>
 </div>
 <div class="part3">
     <h5 class="subtitle"> [运行截图] </h5>
