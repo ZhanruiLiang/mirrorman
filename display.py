@@ -139,6 +139,7 @@ class MenuDisplay(object):
 
 class Display(object):
     def __init__(self):
+        self._cnt = 0
         self.size = config.SCREEN_SIZE
 
         w, h = self.size
@@ -229,6 +230,7 @@ class Display(object):
             glPopMatrix()
 
     def draw_reflected(self, field):
+        #if config.ENABLE_REFLECT: 
         glClearStencil(0)
         glDisable(GL_DEPTH_TEST)
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE)
@@ -258,7 +260,7 @@ class Display(object):
         glBlendEquation(GL_FUNC_ADD)
         #glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR)
-        glColor4fv((.1, .1, .1, .7))
+        glColor4f(.1, .1, .1, .7)
         glPushMatrix()
         field.draw()
         glPopMatrix()
@@ -282,6 +284,7 @@ class Display(object):
             shadowMat, ctypes.c_float, (len(shadowMat), ))
 
     def draw_shadow(self, field):
+        #if not config.ENABLE_SHADOW: return
         #draw shadow stencil
         glClearStencil(0)
         glDisable(GL_DEPTH_TEST)
@@ -334,14 +337,17 @@ class Display(object):
         # self.add(Hint(((100, 100), (300, 100)), text))
 
     def update(self, field):
+        self._cnt += 1
         self.sprites = [sp for sp in self.sprites if sp.alive]
         for sp in self.sprites:
             sp.update()
+        self.lights.update()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
                     GL_STENCIL_BUFFER_BIT)
         glLoadIdentity()
-        self.camera.update()
+        if self._cnt % 2 == 0:
+            self.camera.update()
 
         gw, gh = config.GRID_SIZE
         gt = (gw + gh)/2
@@ -351,15 +357,14 @@ class Display(object):
 
         glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
 
-        #self.draw_shadow(field)
-        self.draw_reflected(field)
+        #self.draw_reflected(field)
         self.draw_sprites()
+        self.draw_shadow(field)
 
         # draw lights
         glPushMatrix()
         # glTranslate(0, 0, 0)
         self.lights.draw()
-        self.lights.update()
         glPopMatrix()
 
         #see light location

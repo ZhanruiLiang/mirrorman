@@ -264,19 +264,19 @@ class Goal(Obstacle):
     modelName = 'exit.obj'
 
 class Lights(Sprite):
-    curDisplace = .3
-    curDetail = .02
+    curDisplace = .4
+    curDetail = .04
     curNum = 2
     curRedColor = 1.
     curRedColorIsAdd = False
     curRedColorIncreaseRate = .1 / 10
-    curLength = .1
+    curLength = .2
 
     def __init__(self):
         super(Lights, self).__init__()
 
     def drawLighting(self, p1, p2, displace, L):
-        if L < self.curLength and displace < self.curDetail:
+        if L < self.curLength or displace < self.curDetail:
         # if L < self.curLength:
             self.nodes.append(p1)
             self.nodes.append(p2)
@@ -332,7 +332,7 @@ class Lights(Sprite):
                 self.curRedColorIsAdd = False
         else:
             self.curRedColor -= self.curRedColorIncreaseRate
-            if self.curRedColor <= .3:
+            if self.curRedColor <= .6:
                 self.curRedColorIsAdd = True
 
 class Player(AnimatedItem):

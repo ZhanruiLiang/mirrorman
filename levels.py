@@ -92,7 +92,7 @@ class Field(Sprite):
         w, h = self.size
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, self.texid)
-        glColor4fv((.8, .8, .8, .7))
+        glColor4f(.9, .9, .9, .77)
         glBegin(GL_QUADS)
         #glTexCoord2f(.0, .0)
         #glVertex3f(-14., -14., .0)
@@ -102,7 +102,7 @@ class Field(Sprite):
         #glVertex3f(90., 90., .0)
         #glTexCoord2f(float(90)/15, 0.)
         #glVertex3f(90., -14., .0)
-        glNormal3fv((0., 0., 1.))
+        glNormal3f(0., 0., 1.)
         glTexCoord2f(.0, .0)
         glVertex3f(-20., -20., .0)
         glTexCoord2f(0., 8.)
@@ -267,10 +267,30 @@ class Level_test_6(Level):
 
         self.collect()
 
+class Level_test_7(Level):
+    name = 'test level 7'
+    def __init__(self):
+        Level.__init__(self, 'level 7', (12, 12))
+        A = self.add
+        A(Player(pos=(1, 1)))
+
+        A(Emitter(pos=(1, 10), orient=(1, 0)))
+        A(Emitter(pos=(10, 9), orient=(-1,0)))
+        A(Emitter(pos=(1, 8), orient=(1,0)))
+        A(Emitter(pos=(10, 7), orient=(-1,0)))
+        A(Emitter(pos=(1, 6), orient=(1,0)))
+        A(Emitter(pos=(10, 5), orient=(-1,0)))
+        A(Emitter(pos=(1, 4), orient=(1,0)))
+        A(Emitter(pos=(10, 3), orient=(-1,0)))
+
+        A(Goal(pos=(5, 11), orient=(0, -1)))
+        self.collect()
+
 levels = [
     Level_test_2,
     Level_test_3,
     Level_test_4,
     Level_test_5,
-    Level_test_6
+    Level_test_6,
+    Level_test_7
 ]

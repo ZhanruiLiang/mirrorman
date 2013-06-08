@@ -2,7 +2,7 @@ import pygame
 import os
 
 GRID_SIZE = 80, 80
-SCREEN_SIZE = 1368, 768
+SCREEN_SIZE = 1000, 700
 FPS = 60
 DD = 3
 # ANIMATION_CUT = 5
@@ -20,8 +20,8 @@ PLAYER_MODEL = 'robot.obj'
 #PLAYER_MODEL = 'capsule.obj'
 
 # FIELD_PIC_PATH = os.path.join("pictures", "71.jpg")
-FIELD_PIC_PATH = os.path.join("pictures", "window4.jpg")
-# FIELD_PIC_PATH = os.path.join("models", "MarbleUTexture.jpg")
+FIELD_PIC_PATH = os.path.join("pictures", "window1.jpg")
+#FIELD_PIC_PATH = os.path.join("models", "MarbleUTexture.jpg")
 
 SHADOW_COLOR = (.1, .1, .1, 1)
 BACK_COLOR = (0., 0., 0., 1)
@@ -43,3 +43,6 @@ MODEL_SUBPATHS = [
         ]
 DAT_PATH = 'models/models.dat'
 GZIP_LEVEL = 3
+
+ENABLE_SHADOW = 0
+ENABLE_REFLECT = 1

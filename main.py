@@ -119,6 +119,10 @@ class Game:
                     key = event.key
                     if key == pygame.K_q:
                         self._quit = True
+                    #elif key == pygame.K_r:
+                    #    config.ENABLE_REFLECT = not config.ENABLE_REFLECT    
+                    #elif key == pygame.K_s:
+                    #    config.ENABLE_SHADOW = not config.ENABLE_SHADOW
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 4:
                         # scroll up, zoom in
