@@ -13,13 +13,12 @@ h6 { font-size: 14pt; color: #d14; border-bottom: 1px solid #d14; }
 .keyword    { font-size: 12pt; color: #08c; }
 .figure { margin-bottom: 50px; }
 .tech>li {
-    font-size: 150%;
+    font-size: 120%;
     font-weight: bold;
     border-radius: 5px;
-    box-shadow: 2px 2px 8px 3px rgba(0, 100, 200, .5);
-    padding: 10px;
+    #box-shadow: 2px 2px 8px 3px rgba(0, 100, 200, .5);
+    #padding: 10px;
     margin: 10px;
-    list-style: none;
 }
 div.TODO { color: red; font-weight: bold; background-color:#f95; font-size: 50px; }
 </style>
@@ -119,7 +118,7 @@ div.TODO { color: red; font-weight: bold; background-color:#f95; font-size: 50px
 
     <div>
         <h6>obj模型导入</h6>
-        <div class="TODO">TODO</div>
+        <p>直接解析obj文件，分为面、法向量、纹理坐标及材质信息四部分读入。</p>
     </div>
     <div>
         <h6>渲染速度优化：改变渲染顺序</h6>
@@ -181,28 +180,101 @@ div.TODO { color: red; font-weight: bold; background-color:#f95; font-size: 50px
         </p>
     </div>
     <div>
-        <h6>渲染速度优化：使用顶点数组配合InterleavedArray</h6>
-        <div class="TODO">TODO</div>
-    </div>
-    <div>
-        <h6>同时开启材质和光照</h6>
-        <div class="TODO">TODO</div>
-        <p></p>
-    </div>
-    <div>
-        <h6>半透明效果</h6>
-        <div class="TODO">TODO</div>
-        <p></p>
-    </div>
-    <div>
         <h6>反射效果</h6>
-        <div class="TODO">TODO</div>
-        <p></p>
+        <p>原理：将场景上的物体倒过来画一次然后再做一些效果。</p>
+        <pre>
+        <code>
+            def draw_reflected(self, field):
+                glClearStencil(0)
+                glDisable(GL_DEPTH_TEST)
+                glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE)
+                glEnable(GL_STENCIL_TEST)
+                glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE)
+                glStencilFunc(GL_ALWAYS, 1, 0xffffffff)
+                glPushMatrix()
+                field.draw()
+                glPopMatrix()
+                glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
+                glEnable(GL_DEPTH_TEST)
+                glStencilFunc(GL_EQUAL, 1, 0xffffffff)
+                glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+
+                glPushMatrix()
+                glScalef(1.0, 1.0, -1.0)
+                glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
+                self.draw_sprites()
+                glDisable(GL_NORMALIZE)
+                glPopMatrix()
+
+                glLight(GL_LIGHT0, GL_POSITION, self.lightPos)
+                glDisable(GL_STENCIL_TEST)
+
+                glEnable(GL_BLEND)
+                glDisable(GL_LIGHTING)
+                glBlendEquation(GL_FUNC_ADD)
+                #glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR)
+                glColor4f(.1, .1, .1, .7)
+                glPushMatrix()
+                field.draw()
+                glPopMatrix()
+                glDisable(GL_BLEND)
+                glEnable(GL_LIGHTING)
+        </code>
+        </pre>
     </div>
     <div>
         <h6>阴影效果</h6>
-        <div class="TODO">TODO</div>
-        <p></p>
+        <p>原理：利用矩阵变换将物体的倒影计算出来。</p>
+        <pre><code>
+            def draw_shadow(self, field):
+                glClearStencil(0)
+                glDisable(GL_DEPTH_TEST)
+                glDisable(GL_LIGHTING)
+                glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE)
+                glEnable(GL_STENCIL_TEST)
+                # print 'glIsEnabled(GL_STENCIL_TEST)', glIsEnabled(GL_STENCIL_TEST)
+                glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE)
+                glStencilFunc(GL_ALWAYS, 1, 0xffffffff)
+
+                glPushMatrix()
+                glMultMatrixf(self.shadowMat)
+                for sp in self.sprites:
+                    if not isinstance(sp, Lights):
+                        glPushMatrix()
+                        x, y = sp.pos
+                        glTranslate(x, y, 0)
+                        sp.draw()
+                        glPopMatrix()
+                glPopMatrix()
+
+                #draw shadow
+                glDisable(GL_TEXTURE_2D)
+                glEnable(GL_STENCIL_TEST)
+                glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE)
+                glEnable(GL_DEPTH_TEST)
+                glStencilFunc(GL_EQUAL, 1, 0xffffffff)
+                glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+
+                glColor4f(*config.SHADOW_COLOR)
+                glPushMatrix()
+                glScale(1., 1., 0.0001)
+                glutSolidCube(1000)
+                glPopMatrix()
+                glDisable(GL_STENCIL_TEST)
+
+                glEnable(GL_LIGHTING)
+                field.draw()
+        </code></pre>
+    </div>
+    <div>
+        <h6>其他效果</h6>
+        <p>原理不作详述了。</p>
+        <ul>
+            <li>渲染速度优化：使用顶点数组配合InterleavedArray</li>
+            <li>同时开启材质和光照</li>
+            <li>半透明效果</li>
+        </ul>
     </div>
     <div>
         <h6>场景摄像机平滑运动</h6>
@@ -244,9 +316,10 @@ div.TODO { color: red; font-weight: bold; background-color:#f95; font-size: 50px
 </div>
 <div class="part3">
     <h5 class="subtitle"> [运行截图] </h5>
-</div>
-<div class="part4">
-    <h5 class="subtitle"> [总结] </h5>
+    <img src="m1.png" width="900px" alt="" />
+    <img src="m2.png" width="900px" alt="" />
+    <img src="m3.png" width="900px" alt="" />
+    <img src="m4.png" width="900px" alt="" />
 </div>
 </div>
 </body>
